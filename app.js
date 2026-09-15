@@ -6,6 +6,9 @@
  * =========================================================================
  */
 
+// URL Padrão do Google Apps Script (quando definida, todos os celulares conectam automaticamente)
+const DEFAULT_GAS_URL = "";
+
 document.addEventListener('DOMContentLoaded', () => {
   // Estado da Aplicação
   const state = {
@@ -15,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     selectedPlace: null,
     attachedPhotos: [], // Array de { id, name, base64, mimeType, dataUrl }
     maxPhotos: 20,
-    scriptUrl: localStorage.getItem('selim_gas_url') || ''
+    scriptUrl: localStorage.getItem('selim_gas_url') || DEFAULT_GAS_URL || ''
   };
 
   // Elementos DOM principais
