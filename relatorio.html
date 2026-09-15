@@ -580,6 +580,22 @@
       color: #a33b3b;
     }
 
+    .retry-report {
+      margin-left: 8px;
+      padding: 7px 12px;
+      border: 0;
+      border-radius: 5px;
+      background: var(--navy);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .retry-report:hover {
+      background: #16375b;
+    }
+
     .report-footer {
       display: flex;
       align-items: center;
@@ -895,15 +911,18 @@
         '</article>';
       }
 
-      function showError(message) {
+      function showError(message, allowRetry) {
         reportContent.classList.add("hidden");
         reportState.className = "error-state";
-        reportState.textContent = message;
+        reportState.innerHTML = '<strong>' + escapeHtml(message) + '</strong>' +
+          (allowRetry ? ' <button type="button" id="btnRetryReport" class="retry-report">Tentar novamente</button>' : '');
+        var retryButton = document.getElementById("btnRetryReport");
+        if (retryButton) retryButton.addEventListener("click", loadReport);
       }
 
       function renderReport(data, start, end) {
         if (!data || data.status !== "success") {
-          showError((data && data.message) || "Não foi possível consultar os registros.");
+          showError((data && data.message) || "Não foi possível consultar os registros.", true);
           return;
         }
 
@@ -950,17 +969,59 @@
         });
         if (inputCategoria.value) params.set("categoria", inputCategoria.value);
 
-        fetch(gasUrl + "?" + params.toString())
-          .then(function (response) {
-            if (!response.ok) throw new Error("Resposta HTTP " + response.status);
-            return response.json();
+        var candidatos = [gasUrl, DEFAULT_GAS_URL].filter(function (url, index, lista) {
+          return url && lista.indexOf(url) === index;
+        });
+
+        function consultar(url, tentativa) {
+          var controller = new AbortController();
+          var timeoutId = setTimeout(function () { controller.abort(); }, 60000);
+          var requestParams = new URLSearchParams(params.toString());
+          requestParams.set("_ts", String(Date.now()));
+
+          return fetch(url + "?" + requestParams.toString(), {
+            method: "GET",
+            mode: "cors",
+            cache: "no-store",
+            credentials: "omit",
+            signal: controller.signal
           })
+            .then(function (response) {
+              if (!response.ok) throw new Error("Resposta HTTP " + response.status);
+              return response.text();
+            })
+            .then(function (text) {
+              try {
+                return JSON.parse(text);
+              } catch (parseError) {
+                throw new Error("O Google retornou uma resposta inválida.");
+              }
+            })
+            .finally(function () { clearTimeout(timeoutId); })
+            .catch(function (error) {
+              clearTimeout(timeoutId);
+              if (tentativa < 1) return consultar(url, tentativa + 1);
+              throw error;
+            });
+        }
+
+        function consultarCandidatos(indice) {
+          if (indice >= candidatos.length) {
+            throw new Error("O serviço do Google não respondeu após duas tentativas.");
+          }
+          return consultar(candidatos[indice], 0).catch(function (error) {
+            if (indice + 1 < candidatos.length) return consultarCandidatos(indice + 1);
+            throw error;
+          });
+        }
+
+        consultarCandidatos(0)
           .then(function (data) {
             renderReport(data, start, end);
             document.title = "Relatório " + formatDate(start) + " a " + formatDate(end) + " • SELIM";
           })
           .catch(function (error) {
-            showError("Não foi possível acessar o Google Apps Script. Verifique a implantação e tente novamente. (" + error.message + ")");
+            showError("Não foi possível acessar o Google Apps Script. O serviço pode estar acordando ou a implantação pode estar indisponível. (" + error.message + ")", true);
           });
       }
 

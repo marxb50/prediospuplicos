@@ -525,7 +525,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
       updateUploadPercent(90);
 
-      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(`Resposta HTTP ${response.status}`);
+      }
+
+      const responseText = await response.text();
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (parseError) {
+        throw new Error('O Google retornou uma resposta inválida. Tente novamente em alguns segundos.');
+      }
 
       if (result.status !== 'success') {
         throw new Error(result.message || 'Erro desconhecido retornado pelo servidor Google.');
