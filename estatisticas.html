@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b2545">
+  <title>Estatísticas de Limpeza • SELIM</title>
+  <style>
+    @page { size: A4 landscape; margin: 10mm; }
+
+    :root {
+      --navy: #0b2545;
+      --blue: #005da4;
+      --cyan: #00a3e0;
+      --gold: #ffc72c;
+      --green: #11844a;
+      --red: #c7352d;
+      --orange: #df7d16;
+      --ink: #162238;
+      --muted: #64748b;
+      --line: #d8e1ea;
+      --soft: #f5f8fb;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: #e8edf3;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .screen-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 18px;
+      background: rgba(11, 37, 69, 0.97);
+      color: #fff;
+      box-shadow: 0 3px 14px rgba(11, 37, 69, 0.25);
+    }
+
+    .toolbar-title { display: flex; flex-direction: column; gap: 2px; }
+    .toolbar-title strong { font-size: 14px; letter-spacing: 0.35px; }
+    .toolbar-title span { color: #b9c9dd; font-size: 11px; }
+    .toolbar-actions { display: flex; align-items: center; gap: 8px; }
+
+    .toolbar-btn {
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 8px;
+      background: transparent;
+      color: #fff;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .toolbar-btn.primary {
+      border-color: var(--gold);
+      background: var(--gold);
+      color: var(--navy);
+    }
+
+    .dashboard {
+      width: min(1180px, calc(100% - 28px));
+      margin: 18px auto 30px;
+      padding: 28px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 6px 28px rgba(11, 37, 69, 0.16);
+    }
+
+    .report-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding-bottom: 11px;
+      border-bottom: 3px solid var(--navy);
+    }
+
+    .brand-lockup { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .brand-logo { width: 190px; max-width: 42%; height: auto; }
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { color: var(--navy); font-size: 13px; letter-spacing: 0.35px; text-transform: uppercase; }
+    .brand-copy span { margin-top: 2px; color: var(--muted); font-size: 10px; }
+
+    .report-tag {
+      flex: 0 0 auto;
+      padding: 6px 10px;
+      border: 1px solid #e0bd42;
+      border-radius: 16px;
+      background: #fff7d6;
+      color: var(--navy);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.45px;
+      text-transform: uppercase;
+    }
+
+    .intro { padding: 20px 0 14px; }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 7px;
+      padding: 5px 10px;
+      border: 1px solid #ead06e;
+      border-radius: 14px;
+      background: #fff9df;
+      color: #7b5a00;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .intro h1 { margin: 0; color: var(--navy); font-size: 27px; line-height: 1.12; }
+    .intro p { margin: 7px 0 0; color: var(--muted); font-size: 12px; }
+
+    .filters {
+      margin-bottom: 15px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--gold);
+      border-radius: 8px;
+      background: #fffdf5;
+    }
+
+    .filter-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 9px;
+      color: var(--navy);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.45px;
+      text-transform: uppercase;
+    }
+
+    .filter-heading span { color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+    .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+
+    .preset {
+      padding: 5px 10px;
+      border: 1px solid #c8d5e2;
+      border-radius: 5px;
+      background: #fff;
+      color: var(--navy);
+      font: inherit;
+      font-size: 10px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .preset.active,
+    .preset:hover { border-color: var(--gold); background: var(--gold); color: var(--navy); }
+
+    .filter-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.3fr 1.4fr auto;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .field label { color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: 0.42px; text-transform: uppercase; }
+
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 34px;
+      padding: 6px 8px;
+      border: 1px solid #c9d6e2;
+      border-radius: 5px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 11px;
+    }
+
+    .generate-btn {
+      min-height: 34px;
+      padding: 7px 13px;
+      border: 0;
+      border-radius: 5px;
+      background: var(--navy);
+      color: #fff;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .generate-btn:hover { background: var(--blue); }
+
+    .loading-state,
+    .error-state,
+    .empty-state {
+      padding: 28px 18px;
+      border: 1px dashed #b9c8d6;
+      border-radius: 8px;
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .error-state { border-color: #efb6b1; background: #fff6f5; color: #a4241d; }
+    .hidden { display: none !important; }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 13px;
+    }
+
+    .kpi-card {
+      position: relative;
+      min-height: 92px;
+      padding: 13px 14px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .kpi-card::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--cyan);
+      content: "";
+    }
+
+    .kpi-card:nth-child(2)::before { background: var(--navy); }
+    .kpi-card:nth-child(3)::before { background: var(--gold); }
+    .kpi-card:nth-child(4)::before { background: var(--green); }
+    .kpi-card:nth-child(5)::before { background: var(--orange); }
+    .kpi-value { display: block; margin-top: 4px; color: var(--navy); font-size: 25px; font-weight: 900; line-height: 1; }
+    .kpi-value.textual { overflow: hidden; font-size: 14px; line-height: 1.2; text-overflow: ellipsis; }
+    .kpi-label { display: block; margin-top: 8px; color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+    .kpi-detail { display: block; margin-top: 4px; color: #485970; font-size: 9px; line-height: 1.25; }
+
+    .insight-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .insight {
+      padding: 10px 11px;
+      border: 1px solid #d7e2ec;
+      border-radius: 7px;
+      background: #f8fbfe;
+      color: #41526a;
+      font-size: 10px;
+      line-height: 1.35;
+    }
+
+    .insight strong { color: var(--navy); }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .chart-card,
+    .planning-card {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .chart-card.full { grid-column: 1 / -1; }
+    .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .card-head h2 { margin: 0; color: var(--navy); font-size: 13px; }
+    .card-head p { margin: 3px 0 0; color: var(--muted); font-size: 9px; line-height: 1.35; }
+    .card-badge { flex: 0 0 auto; padding: 4px 7px; border-radius: 10px; background: #edf6fc; color: var(--blue); font-size: 8px; font-weight: 800; text-transform: uppercase; }
+
+    .monthly-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 7px;
+      min-height: 210px;
+      padding: 12px 4px 0;
+      border-bottom: 1px solid #bfcddb;
+    }
+
+    .month-column { display: flex; flex: 1 1 0; align-items: center; flex-direction: column; justify-content: flex-end; min-width: 0; height: 190px; }
+    .month-value { margin-bottom: 5px; color: var(--navy); font-size: 9px; font-weight: 900; }
+    .month-bar { width: min(30px, 76%); min-height: 3px; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, var(--cyan), var(--blue)); }
+    .month-label { margin-top: 6px; color: var(--muted); font-size: 8px; font-weight: 800; text-transform: uppercase; white-space: nowrap; }
+
+    .donut-layout { display: flex; align-items: center; justify-content: center; gap: 24px; min-height: 220px; }
+    .donut { position: relative; flex: 0 0 auto; width: 150px; height: 150px; border-radius: 50%; background: #e8eef4; }
+    .donut::after { position: absolute; inset: 32px; display: grid; place-items: center; border-radius: 50%; background: #fff; color: var(--navy); font-size: 22px; font-weight: 900; content: attr(data-total); }
+    .legend { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .legend-item { display: grid; grid-template-columns: 9px minmax(0, 1fr) auto; align-items: center; gap: 7px; color: #405168; font-size: 9px; }
+    .legend-dot { width: 9px; height: 9px; border-radius: 2px; }
+    .legend-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .legend-value { color: var(--navy); font-weight: 900; }
+
+    .ranking-chart { display: flex; flex-direction: column; gap: 9px; }
+    .rank-row { display: grid; grid-template-columns: minmax(175px, 1.2fr) 3fr 44px; align-items: center; gap: 10px; }
+    .rank-name { overflow: hidden; color: #31435b; font-size: 9px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+    .rank-track { height: 13px; overflow: hidden; border-radius: 8px; background: #edf2f6; }
+    .rank-fill { height: 100%; min-width: 4px; border-radius: 8px; background: linear-gradient(90deg, var(--navy), var(--cyan)); }
+    .rank-value { color: var(--navy); font-size: 9px; font-weight: 900; text-align: right; }
+
+    .planning-card { margin-top: 12px; }
+    .planning-note { margin: -3px 0 12px; padding: 8px 10px; border-left: 3px solid var(--gold); background: #fff9e3; color: #6a5a24; font-size: 9px; line-height: 1.4; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 9px; }
+    th { padding: 8px 7px; border-bottom: 2px solid var(--navy); background: #edf3f8; color: var(--navy); font-size: 8px; letter-spacing: 0.35px; text-align: left; text-transform: uppercase; }
+    td { padding: 8px 7px; border-bottom: 1px solid #e0e7ee; color: #34465e; vertical-align: middle; }
+    td strong { color: var(--navy); }
+    tbody tr:hover { background: #f8fbfd; }
+    .position { width: 30px; color: var(--blue); font-weight: 900; }
+    .status { display: inline-block; padding: 4px 7px; border-radius: 10px; font-size: 8px; font-weight: 900; white-space: nowrap; }
+    .status.ok { background: #eaf8f0; color: var(--green); }
+    .status.soon { background: #fff5d2; color: #856000; }
+    .status.overdue { background: #fff0ef; color: var(--red); }
+
+    .report-footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 18px; padding-top: 9px; border-top: 1px solid var(--line); color: var(--muted); font-size: 8px; }
+
+    @media (max-width: 900px) {
+      .dashboard { width: calc(100% - 18px); margin: 9px auto 22px; padding: 18px 12px; }
+      .report-header { align-items: flex-start; flex-direction: column; }
+      .brand-logo { width: 205px; max-width: 65%; }
+      .filter-fields { grid-template-columns: 1fr 1fr; }
+      .field:nth-child(3), .field:nth-child(4), .generate-btn { grid-column: span 2; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .kpi-card:last-child { grid-column: span 2; }
+      .insight-strip, .charts-grid { grid-template-columns: 1fr; }
+      .chart-card.full { grid-column: auto; }
+      .donut-layout { align-items: flex-start; flex-direction: column; }
+      .rank-row { grid-template-columns: minmax(125px, 1.3fr) 2fr 40px; }
+    }
+
+    @media (max-width: 560px) {
+      .screen-toolbar { align-items: flex-start; flex-direction: column; }
+      .toolbar-actions { width: 100%; }
+      .toolbar-btn { flex: 1; text-align: center; }
+      .intro h1 { font-size: 22px; }
+      .kpi-grid { grid-template-columns: 1fr; }
+      .kpi-card:last-child { grid-column: auto; }
+      .monthly-chart { gap: 3px; }
+      .month-label { font-size: 7px; transform: rotate(-45deg); transform-origin: center; }
+      .rank-row { grid-template-columns: 1fr; gap: 4px; }
+      .rank-value { text-align: left; }
+    }
+
+    @media print {
+      html, body { background: #fff; }
+      .screen-toolbar, .filters { display: none !important; }
+      .dashboard { width: auto; margin: 0; padding: 0; box-shadow: none; }
+      .intro { padding-top: 10px; }
+      .chart-card, .planning-card, .kpi-card { box-shadow: none; }
+      .report-footer { margin-bottom: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="screen-toolbar">
+    <div class="toolbar-title">
+      <strong>Painel de estatísticas</strong>
+      <span>Frequência, recorrência e planejamento das próximas limpezas</span>
+    </div>
+    <div class="toolbar-actions">
+      <a class="toolbar-btn" href="index.html">← Voltar ao cadastro</a>
+      <a class="toolbar-btn" href="relatorio.html">Relatório detalhado</a>
+      <button id="btnPrint" class="toolbar-btn primary" type="button">🖨 Imprimir / PDF</button>
+    </div>
+  </div>
+
+  <main class="dashboard">
+    <header class="report-header">
+      <div class="brand-lockup">
+        <img class="brand-logo" src="logo.png" alt="Prefeitura de Parnamirim">
+        <div class="brand-copy">
+          <strong>SELIM • Limpeza Urbana</strong>
+          <span>Prefeitura Municipal de Parnamirim • Rio Grande do Norte</span>
+        </div>
+      </div>
+      <div class="report-tag">Estatísticas operacionais</div>
+    </header>
+
+    <section class="intro">
+      <span class="eyebrow">Planejamento e recorrência</span>
+      <h1>Estatísticas de limpeza dos prédios públicos</h1>
+      <p id="periodText">Carregando o histórico de execuções...</p>
+    </section>
+
+    <section class="filters" aria-label="Filtros das estatísticas">
+      <div class="filter-heading">
+        <strong>Período e recorte</strong>
+        <span>Os cálculos consideram apenas execuções registradas</span>
+      </div>
+      <div class="preset-row">
+        <button class="preset active" type="button" data-preset="year">Ano atual</button>
+        <button class="preset" type="button" data-preset="90days">Últimos 90 dias</button>
+        <button class="preset" type="button" data-preset="all">Todo o histórico</button>
+        <button class="preset" type="button" data-preset="custom">Personalizado</button>
+      </div>
+      <div class="filter-fields">
+        <div class="field">
+          <label for="inputInicio">Data inicial</label>
+          <input id="inputInicio" type="date">
+        </div>
+        <div class="field">
+          <label for="inputFim">Data final</label>
+          <input id="inputFim" type="date">
+        </div>
+        <div class="field">
+          <label for="inputCategoria">Categoria</label>
+          <select id="inputCategoria">
+            <option value="">Todas as categorias</option>
+            <option>Unidades Básicas de Saúde (UBS)</option>
+            <option>Escolas Municipais</option>
+            <option>Centros Infantis (C.I.M.)</option>
+            <option>SEMAS (CRAS / SCFV)</option>
+            <option>Distrito Litoral</option>
+            <option>Outros Prédios Públicos</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="inputPredio">Prédio / local</label>
+          <select id="inputPredio">
+            <option value="">Todos os prédios</option>
+          </select>
+        </div>
+        <button id="btnGenerate" class="generate-btn" type="button">Atualizar estatísticas</button>
+      </div>
+    </section>
+
+    <div id="dashboardState" class="loading-state">Consultando o histórico de limpezas...</div>
+
+    <div id="dashboardContent" class="hidden">
+      <section class="kpi-grid" aria-label="Indicadores principais">
+        <div class="kpi-card"><strong id="kpiExecutions" class="kpi-value">0</strong><span class="kpi-label">Execuções no período</span><span id="kpiExecutionsDetail" class="kpi-detail"></span></div>
+        <div class="kpi-card"><strong id="kpiBuildings" class="kpi-value">0</strong><span class="kpi-label">Prédios atendidos</span><span id="kpiBuildingsDetail" class="kpi-detail"></span></div>
+        <div class="kpi-card"><strong id="kpiAverage" class="kpi-value">0</strong><span class="kpi-label">Média por prédio</span><span class="kpi-detail">execuções registradas</span></div>
+        <div class="kpi-card"><strong id="kpiLeader" class="kpi-value textual">—</strong><span class="kpi-label">Maior frequência</span><span id="kpiLeaderDetail" class="kpi-detail"></span></div>
+        <div class="kpi-card"><strong id="kpiAttention" class="kpi-value">0</strong><span class="kpi-label">Revisão recomendada</span><span class="kpi-detail">previsões vencidas</span></div>
+      </section>
+
+      <section class="insight-strip" aria-label="Destaques do período">
+        <div id="insightFrequency" class="insight"></div>
+        <div id="insightMonth" class="insight"></div>
+        <div id="insightPlanning" class="insight"></div>
+      </section>
+
+      <section class="charts-grid">
+        <article class="chart-card">
+          <div class="card-head"><div><h2>Execuções por mês</h2><p>Evolução do volume de limpezas no período selecionado.</p></div><span class="card-badge">Tendência mensal</span></div>
+          <div id="monthlyChart" class="monthly-chart" aria-label="Gráfico de execuções por mês"></div>
+        </article>
+
+        <article class="chart-card">
+          <div class="card-head"><div><h2>Distribuição por categoria</h2><p>Participação de cada tipo de prédio nas execuções.</p></div><span class="card-badge">Composição</span></div>
+          <div class="donut-layout">
+            <div id="categoryDonut" class="donut" data-total="0" aria-label="Gráfico por categoria"></div>
+            <div id="categoryLegend" class="legend"></div>
+          </div>
+        </article>
+
+        <article class="chart-card full">
+          <div class="card-head"><div><h2>Ranking de frequência de limpeza</h2><p>Ordem dos prédios com mais execuções registradas no período.</p></div><span class="card-badge">Maior frequência primeiro</span></div>
+          <div id="rankingChart" class="ranking-chart" aria-label="Ranking de frequência por prédio"></div>
+        </article>
+      </section>
+
+      <section class="planning-card">
+        <div class="card-head"><div><h2>Planejamento das próximas limpezas</h2><p>Última execução, intervalo estimado e próxima data prevista por prédio.</p></div><span class="card-badge">Agenda estimada</span></div>
+        <div class="planning-note"><strong>Como a previsão é calculada:</strong> usa o intervalo mediano entre execuções do próprio prédio. Sem histórico suficiente, usa a média da categoria; enquanto não houver recorrência, considera um ciclo inicial de 30 dias.</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Prédio público</th><th>Categoria</th><th>Frequência</th><th>Última limpeza</th><th>Intervalo estimado</th><th>Próxima limpeza</th><th>Situação</th></tr></thead>
+            <tbody id="planningTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <footer class="report-footer"><span>Prefeitura Municipal de Parnamirim • SELIM</span><span id="generatedText">Estatísticas geradas automaticamente</span></footer>
+  </main>
+
+  <script>
+    (function () {
+      var DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbxknOR0N0KFBkfhWYJ5YtH_zj_sNmlMXjmQF6Cy7xmbwmf5Cg3IYs5zFQnP3hIAqkWB/exec";
+      var COLORS = ["#005da4", "#00a3e0", "#ffc72c", "#11844a", "#7c57b8", "#df7d16", "#c7352d"];
+      var query = new URLSearchParams(window.location.search);
+      var gasUrl = query.get("gas") || localStorage.getItem("selim_gas_url") || DEFAULT_GAS_URL;
+      var inputInicio = document.getElementById("inputInicio");
+      var inputFim = document.getElementById("inputFim");
+      var inputCategoria = document.getElementById("inputCategoria");
+      var inputPredio = document.getElementById("inputPredio");
+      var btnGenerate = document.getElementById("btnGenerate");
+      var dashboardState = document.getElementById("dashboardState");
+      var dashboardContent = document.getElementById("dashboardContent");
+      var allRecords = [];
+
+      function pad(value) { return String(value).padStart(2, "0"); }
+      function isoDate(date) { return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate()); }
+      function escapeHtml(value) {
+        return String(value === undefined || value === null ? "" : value)
+          .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+      }
+      function normalizeText(value) {
+        return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+      }
+      function parseDate(record) {
+        var iso = String(record.dataIso || "");
+        if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) return new Date(iso + "T12:00:00");
+        var match = String(record.dataExecucao || "").match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/);
+        return match ? new Date(Number(match[3]), Number(match[2]) - 1, Number(match[1]), 12) : null;
+      }
+      function formatDate(date) {
+        if (!date || isNaN(date.getTime())) return "—";
+        return pad(date.getDate()) + "/" + pad(date.getMonth() + 1) + "/" + date.getFullYear();
+      }
+      function formatPeriod() {
+        if (!inputInicio.value && !inputFim.value) return "Todo o histórico registrado";
+        var start = inputInicio.value ? formatDate(new Date(inputInicio.value + "T12:00:00")) : "início";
+        var end = inputFim.value ? formatDate(new Date(inputFim.value + "T12:00:00")) : "hoje";
+        return "Período analisado: " + start + " a " + end;
+      }
+      function daysBetween(a, b) { return Math.max(0, Math.round((b.getTime() - a.getTime()) / 86400000)); }
+      function addDays(date, days) { var copy = new Date(date.getTime()); copy.setDate(copy.getDate() + days); return copy; }
+      function median(values) {
+        if (!values.length) return null;
+        var sorted = values.slice().sort(function (a, b) { return a - b; });
+        var middle = Math.floor(sorted.length / 2);
+        return sorted.length % 2 ? sorted[middle] : Math.round((sorted[middle - 1] + sorted[middle]) / 2);
+      }
+      function plural(count, singular, pluralText) { return count + " " + (count === 1 ? singular : pluralText); }
+
+      function setPeriod(type) {
+        var today = new Date();
+        if (type === "year") {
+          inputInicio.value = today.getFullYear() + "-01-01";
+          inputFim.value = today.getFullYear() + "-12-31";
+        } else if (type === "90days") {
+          var start = new Date(today.getTime());
+          start.setDate(start.getDate() - 89);
+          inputInicio.value = isoDate(start);
+          inputFim.value = isoDate(today);
+        } else if (type === "all") {
+          inputInicio.value = "";
+          inputFim.value = "";
+        }
+        document.querySelectorAll(".preset").forEach(function (button) {
+          button.classList.toggle("active", button.getAttribute("data-preset") === type);
+        });
+      }
+
+      function groupByBuilding(records) {
+        var groups = {};
+        records.forEach(function (record) {
+          var key = normalizeText(record.predioNome || "Prédio não informado");
+          if (!groups[key]) groups[key] = {name: record.predioNome || "Prédio não informado", category: record.categoria || "Geral", records: []};
+          groups[key].records.push(record);
+        });
+        return groups;
+      }
+
+      function filterRecords(records) {
+        var start = inputInicio.value ? new Date(inputInicio.value + "T00:00:00") : null;
+        var end = inputFim.value ? new Date(inputFim.value + "T23:59:59") : null;
+        var category = normalizeText(inputCategoria.value);
+        var building = normalizeText(inputPredio.value);
+        return records.filter(function (record) {
+          var date = parseDate(record);
+          if (start && (!date || date < start)) return false;
+          if (end && (!date || date > end)) return false;
+          if (category && normalizeText(record.categoria) !== category) return false;
+          if (building && normalizeText(record.predioNome) !== building) return false;
+          return true;
+        });
+      }
+
+      function populateBuildingFilter() {
+        var current = inputPredio.value;
+        var category = normalizeText(inputCategoria.value);
+        var buildings = Array.from(new Set(allRecords.filter(function (record) {
+          return !category || normalizeText(record.categoria) === category;
+        }).map(function (record) { return record.predioNome || ""; }).filter(Boolean))).sort(function (a, b) {
+          return a.localeCompare(b, "pt-BR", {numeric: true});
+        });
+        inputPredio.innerHTML = '<option value="">Todos os prédios</option>' + buildings.map(function (name) {
+          return '<option value="' + escapeHtml(name) + '">' + escapeHtml(name) + '</option>';
+        }).join("");
+        if (buildings.indexOf(current) > -1) inputPredio.value = current;
+      }
+
+      function buildModels(records) {
+        var groups = groupByBuilding(records);
+        var categoryGaps = {};
+        var globalGaps = [];
+        Object.keys(groups).forEach(function (key) {
+          var dates = groups[key].records.map(parseDate).filter(Boolean).sort(function (a, b) { return a - b; });
+          var gaps = [];
+          for (var i = 1; i < dates.length; i++) {
+            var gap = daysBetween(dates[i - 1], dates[i]);
+            if (gap > 0) gaps.push(gap);
+          }
+          groups[key].dates = dates;
+          groups[key].gaps = gaps;
+          if (!categoryGaps[groups[key].category]) categoryGaps[groups[key].category] = [];
+          categoryGaps[groups[key].category] = categoryGaps[groups[key].category].concat(gaps);
+          globalGaps = globalGaps.concat(gaps);
+        });
+        return {groups: groups, categoryGaps: categoryGaps, globalGaps: globalGaps};
+      }
+
+      function predictionFor(group, models) {
+        var interval = median(group.gaps);
+        var source = "histórico do prédio";
+        if (!interval) {
+          interval = median(models.categoryGaps[group.category] || []);
+          source = "média da categoria";
+        }
+        if (!interval) {
+          interval = median(models.globalGaps);
+          source = "média geral";
+        }
+        if (!interval) {
+          interval = 30;
+          source = "ciclo inicial";
+        }
+        interval = Math.max(1, Math.round(interval));
+        var last = group.dates[group.dates.length - 1] || null;
+        return {interval: interval, source: source, last: last, next: last ? addDays(last, interval) : null};
+      }
+
+      function buildingRanking(records) {
+        var groups = groupByBuilding(records);
+        return Object.keys(groups).map(function (key) {
+          var dates = groups[key].records.map(parseDate).filter(Boolean).sort(function (a, b) { return a - b; });
+          return {key: key, name: groups[key].name, category: groups[key].category, count: groups[key].records.length, last: dates[dates.length - 1] || null};
+        }).sort(function (a, b) {
+          if (b.count !== a.count) return b.count - a.count;
+          return (b.last ? b.last.getTime() : 0) - (a.last ? a.last.getTime() : 0) || a.name.localeCompare(b.name, "pt-BR");
+        });
+      }
+
+      function renderMonthlyChart(records) {
+        var counts = {};
+        records.forEach(function (record) {
+          var date = parseDate(record);
+          if (!date) return;
+          var key = date.getFullYear() + "-" + pad(date.getMonth() + 1);
+          counts[key] = (counts[key] || 0) + 1;
+        });
+        var start = inputInicio.value ? new Date(inputInicio.value + "T12:00:00") : null;
+        var end = inputFim.value ? new Date(inputFim.value + "T12:00:00") : null;
+        var keys = [];
+        if (start && end) {
+          var cursor = new Date(start.getFullYear(), start.getMonth(), 1, 12);
+          var endMonth = new Date(end.getFullYear(), end.getMonth(), 1, 12);
+          while (cursor <= endMonth && keys.length < 60) {
+            keys.push(cursor.getFullYear() + "-" + pad(cursor.getMonth() + 1));
+            cursor.setMonth(cursor.getMonth() + 1);
+          }
+          if (keys.length > 12) keys = keys.slice(-12);
+        } else {
+          keys = Object.keys(counts).sort().slice(-12);
+        }
+        if (!keys.length) {
+          var today = new Date();
+          keys = [today.getFullYear() + "-" + pad(today.getMonth() + 1)];
+        }
+        var max = Math.max.apply(null, keys.map(function (key) { return counts[key] || 0; }).concat([1]));
+        document.getElementById("monthlyChart").innerHTML = keys.map(function (key) {
+          var parts = key.split("-");
+          var date = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
+          var value = counts[key] || 0;
+          var height = value ? Math.max(8, Math.round((value / max) * 150)) : 3;
+          var label = date.toLocaleDateString("pt-BR", {month: "short"}).replace(".", "") + "/" + String(parts[0]).slice(-2);
+          return '<div class="month-column" title="' + escapeHtml(label + ": " + value) + '"><span class="month-value">' + value + '</span><div class="month-bar" style="height:' + height + 'px"></div><span class="month-label">' + escapeHtml(label) + '</span></div>';
+        }).join("");
+        return counts;
+      }
+
+      function renderCategoryChart(records) {
+        var counts = {};
+        records.forEach(function (record) { var name = record.categoria || "Geral"; counts[name] = (counts[name] || 0) + 1; });
+        var items = Object.keys(counts).map(function (name) { return {name: name, value: counts[name]}; }).sort(function (a, b) { return b.value - a.value; });
+        var total = records.length;
+        var current = 0;
+        var segments = items.map(function (item, index) {
+          var start = current;
+          current += total ? (item.value / total) * 100 : 0;
+          return COLORS[index % COLORS.length] + " " + start.toFixed(2) + "% " + current.toFixed(2) + "%";
+        });
+        var donut = document.getElementById("categoryDonut");
+        donut.style.background = segments.length ? "conic-gradient(" + segments.join(",") + ")" : "#e8eef4";
+        donut.setAttribute("data-total", String(total));
+        document.getElementById("categoryLegend").innerHTML = items.length ? items.map(function (item, index) {
+          var percent = total ? Math.round((item.value / total) * 100) : 0;
+          return '<div class="legend-item"><span class="legend-dot" style="background:' + COLORS[index % COLORS.length] + '"></span><span class="legend-name" title="' + escapeHtml(item.name) + '">' + escapeHtml(item.name) + '</span><span class="legend-value">' + item.value + ' · ' + percent + '%</span></div>';
+        }).join("") : '<div class="empty-state">Sem categorias no período.</div>';
+      }
+
+      function renderRankingChart(ranking) {
+        var top = ranking.slice(0, 10);
+        var max = top.length ? top[0].count : 1;
+        document.getElementById("rankingChart").innerHTML = top.length ? top.map(function (item, index) {
+          var width = Math.max(3, Math.round((item.count / max) * 100));
+          return '<div class="rank-row"><span class="rank-name" title="' + escapeHtml(item.name) + '">' + (index + 1) + 'º · ' + escapeHtml(item.name) + '</span><div class="rank-track"><div class="rank-fill" style="width:' + width + '%"></div></div><span class="rank-value">' + plural(item.count, "vez", "vezes") + '</span></div>';
+        }).join("") : '<div class="empty-state">Sem execuções no período selecionado.</div>';
+      }
+
+      function statusFor(nextDate) {
+        if (!nextDate) return {className: "ok", label: "Sem previsão"};
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        var next = new Date(nextDate.getTime());
+        next.setHours(0, 0, 0, 0);
+        var difference = Math.ceil((next - today) / 86400000);
+        if (difference < 0) return {className: "overdue", label: "Atrasada há " + Math.abs(difference) + " dias"};
+        if (difference <= 7) return {className: "soon", label: difference === 0 ? "Prevista para hoje" : "Em " + difference + " dias"};
+        return {className: "ok", label: "Prevista"};
+      }
+
+      function renderPlanning(ranking, models) {
+        var overdue = 0;
+        var rows = ranking.map(function (item, index) {
+          var group = models.groups[item.key];
+          var prediction = predictionFor(group, models);
+          var status = statusFor(prediction.next);
+          if (status.className === "overdue") overdue++;
+          return '<tr><td class="position">' + (index + 1) + 'º</td><td><strong>' + escapeHtml(item.name) + '</strong></td><td>' + escapeHtml(item.category) + '</td><td>' + plural(item.count, "execução", "execuções") + '</td><td>' + formatDate(prediction.last) + '</td><td>' + prediction.interval + ' dias<br><small>' + escapeHtml(prediction.source) + '</small></td><td><strong>' + formatDate(prediction.next) + '</strong></td><td><span class="status ' + status.className + '">' + escapeHtml(status.label) + '</span></td></tr>';
+        }).join("");
+        document.getElementById("planningTable").innerHTML = rows || '<tr><td colspan="8"><div class="empty-state">Sem prédios para planejar neste período.</div></td></tr>';
+        return overdue;
+      }
+
+      function renderDashboard() {
+        populateBuildingFilter();
+        var records = filterRecords(allRecords);
+        var ranking = buildingRanking(records);
+        var models = buildModels(allRecords);
+        var monthlyCounts = renderMonthlyChart(records);
+        renderCategoryChart(records);
+        renderRankingChart(ranking);
+        var overdue = renderPlanning(ranking, models);
+        var average = ranking.length ? records.length / ranking.length : 0;
+        var leader = ranking[0] || null;
+        var monthEntries = Object.keys(monthlyCounts).map(function (key) { return {key: key, value: monthlyCounts[key]}; }).sort(function (a, b) { return b.value - a.value || a.key.localeCompare(b.key); });
+        var bestMonth = monthEntries[0] || null;
+        var bestMonthLabel = "—";
+        if (bestMonth && bestMonth.value) {
+          var parts = bestMonth.key.split("-");
+          bestMonthLabel = new Date(Number(parts[0]), Number(parts[1]) - 1, 1).toLocaleDateString("pt-BR", {month: "long", year: "numeric"});
+        }
+
+        document.getElementById("kpiExecutions").textContent = records.length;
+        document.getElementById("kpiExecutionsDetail").textContent = formatPeriod();
+        document.getElementById("kpiBuildings").textContent = ranking.length;
+        document.getElementById("kpiBuildingsDetail").textContent = ranking.length ? "locais com atendimento" : "nenhum local no período";
+        document.getElementById("kpiAverage").textContent = average.toLocaleString("pt-BR", {minimumFractionDigits: 1, maximumFractionDigits: 1});
+        document.getElementById("kpiLeader").textContent = leader ? leader.name : "—";
+        document.getElementById("kpiLeaderDetail").textContent = leader ? plural(leader.count, "execução", "execuções") : "sem dados";
+        document.getElementById("kpiAttention").textContent = overdue;
+        document.getElementById("periodText").textContent = formatPeriod() + (inputCategoria.value ? " • " + inputCategoria.value : "") + (inputPredio.value ? " • " + inputPredio.value : "");
+        document.getElementById("generatedText").textContent = "Gerado em " + new Date().toLocaleString("pt-BR");
+
+        document.getElementById("insightFrequency").innerHTML = leader ? '<strong>Maior frequência:</strong> ' + escapeHtml(leader.name) + ' lidera com ' + plural(leader.count, "execução", "execuções") + ' no período.' : '<strong>Maior frequência:</strong> sem dados para calcular.';
+        document.getElementById("insightMonth").innerHTML = bestMonth && bestMonth.value ? '<strong>Mês de maior atividade:</strong> ' + escapeHtml(bestMonthLabel) + ', com ' + plural(bestMonth.value, "execução", "execuções") + '.' : '<strong>Mês de maior atividade:</strong> sem dados para calcular.';
+        document.getElementById("insightPlanning").innerHTML = overdue ? '<strong>Atenção ao planejamento:</strong> ' + plural(overdue, "prédio está", "prédios estão") + ' com previsão vencida.' : '<strong>Planejamento:</strong> nenhuma previsão vencida entre os prédios exibidos.';
+
+        dashboardState.classList.add("hidden");
+        dashboardContent.classList.remove("hidden");
+      }
+
+      function showError(message) {
+        dashboardContent.classList.add("hidden");
+        dashboardState.className = "error-state";
+        dashboardState.innerHTML = '<strong>' + escapeHtml(message) + '</strong> <button id="btnRetry" class="preset" type="button">Tentar novamente</button>';
+        var retry = document.getElementById("btnRetry");
+        if (retry) retry.addEventListener("click", loadData);
+      }
+
+      function fetchJson(url, params) {
+        var requestParams = new URLSearchParams(params);
+        requestParams.set("_ts", String(Date.now()));
+        var controller = new AbortController();
+        var timeout = setTimeout(function () { controller.abort(); }, 60000);
+        return fetch(url + "?" + requestParams.toString(), {method: "GET", mode: "cors", cache: "no-store", credentials: "omit", signal: controller.signal})
+          .then(function (response) { if (!response.ok) throw new Error("Resposta HTTP " + response.status); return response.text(); })
+          .then(function (text) { try { return JSON.parse(text); } catch (error) { throw new Error("O Google retornou uma resposta inválida."); } })
+          .finally(function () { clearTimeout(timeout); });
+      }
+
+      function loadFromEndpoint(url) {
+        return fetchJson(url, {acao: "estatisticas"}).then(function (data) {
+          if (data && data.status === "success" && Array.isArray(data.registros)) return data;
+          return fetchJson(url, {acao: "relatorio"});
+        });
+      }
+
+      function loadData() {
+        dashboardContent.classList.add("hidden");
+        dashboardState.className = "loading-state";
+        dashboardState.textContent = "Consultando o histórico de limpezas...";
+        var candidates = [gasUrl, DEFAULT_GAS_URL].filter(function (url, index, list) { return url && list.indexOf(url) === index; });
+
+        function tryCandidate(index) {
+          if (index >= candidates.length) throw new Error("O serviço do Google não respondeu.");
+          return loadFromEndpoint(candidates[index]).catch(function (error) {
+            if (index + 1 < candidates.length) return tryCandidate(index + 1);
+            throw error;
+          });
+        }
+
+        tryCandidate(0).then(function (data) {
+          if (!data || data.status !== "success" || !Array.isArray(data.registros)) throw new Error((data && data.message) || "Não foi possível carregar as estatísticas.");
+          allRecords = data.registros;
+          renderDashboard();
+        }).catch(function (error) { showError("Não foi possível gerar as estatísticas. " + error.message); });
+      }
+
+      document.querySelectorAll(".preset").forEach(function (button) {
+        button.addEventListener("click", function () {
+          var type = button.getAttribute("data-preset");
+          if (type !== "custom") setPeriod(type);
+          else document.querySelectorAll(".preset").forEach(function (item) { item.classList.remove("active"); });
+          renderDashboard();
+        });
+      });
+      inputInicio.addEventListener("change", function () { document.querySelectorAll(".preset").forEach(function (item) { item.classList.remove("active"); }); renderDashboard(); });
+      inputFim.addEventListener("change", function () { document.querySelectorAll(".preset").forEach(function (item) { item.classList.remove("active"); }); renderDashboard(); });
+      inputCategoria.addEventListener("change", function () { inputPredio.value = ""; populateBuildingFilter(); renderDashboard(); });
+      inputPredio.addEventListener("change", renderDashboard);
+      btnGenerate.addEventListener("click", renderDashboard);
+      document.getElementById("btnPrint").addEventListener("click", function () { window.print(); });
+
+      if (query.get("inicio") || query.get("fim")) {
+        inputInicio.value = query.get("inicio") || "";
+        inputFim.value = query.get("fim") || "";
+        document.querySelectorAll(".preset").forEach(function (item) { item.classList.remove("active"); });
+      } else {
+        setPeriod("year");
+      }
+      loadData();
+    }());
+  </script>
+</body>
+</html>

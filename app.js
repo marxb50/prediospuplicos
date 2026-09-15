@@ -77,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnOpenSheet = document.getElementById('btnOpenSheet');
   const btnNewSubmission = document.getElementById('btnNewSubmission');
   const btnOpenReports = document.getElementById('btnOpenReports');
+  const btnOpenStatistics = document.getElementById('btnOpenStatistics');
 
   // Modais e Overlays
   const settingsModal = document.getElementById('settingsModal');
@@ -657,6 +658,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const reportUrl = new URL('relatorio.html', window.location.href);
       if (state.scriptUrl) reportUrl.searchParams.set('gas', state.scriptUrl);
       window.open(reportUrl.toString(), '_blank', 'noopener,noreferrer');
+    });
+
+    btnOpenStatistics.addEventListener('click', (event) => {
+      event.preventDefault();
+      const statisticsUrl = new URL('estatisticas.html', window.location.href);
+      if (state.scriptUrl) statisticsUrl.searchParams.set('gas', state.scriptUrl);
+      window.open(statisticsUrl.toString(), '_blank', 'noopener,noreferrer');
     });
 
     // Modal de Configurações

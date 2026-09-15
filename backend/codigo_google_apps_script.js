@@ -36,6 +36,10 @@ function doGet(e) {
     return responderJson(obterRelatorio(parametros));
   }
 
+  if (parametros.acao === "estatisticas" || parametros.action === "statistics") {
+    return responderJson(obterDadosEstatisticos(parametros));
+  }
+
   return responderJson({
     status: "ok",
     app: "SELIM Prédios Públicos API",
@@ -43,6 +47,69 @@ function doGet(e) {
     dataHoraServidor: new Date().toISOString(),
     mensagem: "O Web App do Google Apps Script está ativo e pronto para receber fotos e relatórios."
   });
+}
+
+/** Entrega somente os dados operacionais usados nos cálculos estatísticos. */
+function obterDadosEstatisticos(parametros) {
+  try {
+    const pastaRaiz = obterOuCriarPastaRaiz(NOME_PASTA_PRINCIPAL);
+    const arquivoPlanilha = pastaRaiz.getFilesByName(NOME_PLANILHA);
+
+    if (!arquivoPlanilha.hasNext()) {
+      return {
+        status: "success",
+        acao: "estatisticas",
+        registros: []
+      };
+    }
+
+    const planilha = SpreadsheetApp.openById(arquivoPlanilha.next().getId());
+    const aba = garantirAbaRegistros(planilha);
+    const valores = aba.getDataRange().getDisplayValues();
+    const inicio = parametros.inicio ? converterData(parametros.inicio) : null;
+    const fim = parametros.fim ? converterData(parametros.fim) : null;
+    if (fim) fim.setHours(23, 59, 59, 999);
+    const categoriaFiltro = String(parametros.categoria || "").trim().toLowerCase();
+    const registros = [];
+
+    for (let i = 1; i < valores.length; i++) {
+      const linha = valores[i];
+      if (!linha || !linha[1]) continue;
+
+      const dataExecucao = converterData(linha[1]);
+      if (inicio && (!dataExecucao || dataExecucao < inicio)) continue;
+      if (fim && (!dataExecucao || dataExecucao > fim)) continue;
+      if (categoriaFiltro && String(linha[2] || "").trim().toLowerCase() !== categoriaFiltro) continue;
+
+      registros.push({
+        timestamp: linha[0] || "",
+        dataExecucao: linha[1] || "",
+        dataIso: dataExecucao ? Utilities.formatDate(dataExecucao, FUSO_HORARIO, "yyyy-MM-dd") : "",
+        categoria: linha[2] || "Geral",
+        predioNome: linha[3] || "Prédio não informado",
+        endereco: linha[4] || "Endereço não informado",
+        responsavel: linha[7] || "Não informado"
+      });
+    }
+
+    registros.sort(function(a, b) {
+      return String(b.dataIso || b.dataExecucao).localeCompare(String(a.dataIso || a.dataExecucao));
+    });
+
+    return {
+      status: "success",
+      acao: "estatisticas",
+      totalExecucoes: registros.length,
+      registros: registros,
+      sheetUrl: planilha.getUrl()
+    };
+  } catch (error) {
+    Logger.log("Erro ao montar estatísticas: " + error.toString());
+    return {
+      status: "error",
+      message: error.message || error.toString()
+    };
+  }
 }
 
 /** Recebe os dados do aplicativo e salva a execução no Drive e na planilha. */

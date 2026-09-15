@@ -1017,11 +1017,18 @@ textarea.form-control {
 }
 
 /* Acesso rápido para gerar o relatório operacional */
-.report-launcher {
+.quick-launchers {
   position: fixed;
   right: 18px;
   bottom: calc(18px + env(safe-area-inset-bottom));
   z-index: 90;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.report-launcher {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -1041,6 +1048,22 @@ textarea.form-control {
   background: var(--primary);
   color: #ffffff;
   transform: translateY(-2px);
+}
+
+.statistics-launcher {
+  border-color: rgba(11, 37, 69, 0.2);
+  background: #ffc72c;
+  color: #0b2545;
+  box-shadow: 0 7px 18px rgba(160, 112, 0, 0.28);
+}
+
+.statistics-launcher:hover {
+  background: #ffda66;
+  color: #0b2545;
+}
+
+.statistics-launcher .report-launcher-icon {
+  border-color: rgba(11, 37, 69, 0.5);
 }
 
 .report-launcher-icon {
