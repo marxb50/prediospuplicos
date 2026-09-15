@@ -742,12 +742,12 @@
           <label for="inputCategoria">Categoria</label>
           <select id="inputCategoria">
             <option value="">Todas as categorias</option>
-            <option>UBS</option>
+            <option>Unidades Básicas de Saúde (UBS)</option>
             <option>Escolas Municipais</option>
-            <option>C.I.M.</option>
-            <option>SEMAS</option>
+            <option>Centros Infantis (C.I.M.)</option>
+            <option>SEMAS (CRAS / SCFV)</option>
             <option>Distrito Litoral</option>
-            <option>Outros</option>
+            <option>Outros Prédios Públicos</option>
           </select>
         </div>
         <button id="btnGenerate" class="generate-btn" type="button">Gerar relatório</button>
@@ -981,7 +981,13 @@
       btnGenerate.addEventListener("click", loadReport);
       document.getElementById("btnPrint").addEventListener("click", function () { window.print(); });
 
-      setPeriod("month");
+      if (query.get("inicio") && query.get("fim")) {
+        inputInicio.value = query.get("inicio");
+        inputFim.value = query.get("fim");
+        document.querySelectorAll(".preset").forEach(function (item) { item.classList.remove("active"); });
+      } else {
+        setPeriod("month");
+      }
       loadReport();
     }());
   </script>
