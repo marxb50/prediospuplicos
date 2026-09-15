@@ -411,10 +411,10 @@
       else if (status.className === 'overdue') { overdue++; attention++; }
       return {item: item, prediction: prediction, status: status};
     }).sort(function (a, b) {
-      if (a.status.priority !== b.status.priority) return a.status.priority - b.status.priority;
-      var aDate = a.prediction.next ? a.prediction.next.getTime() : 0;
-      var bDate = b.prediction.next ? b.prediction.next.getTime() : 0;
-      return aDate - bDate || a.item.name.localeCompare(b.item.name, 'pt-BR');
+      if (b.item.count !== a.item.count) return b.item.count - a.item.count;
+      var aLast = a.prediction.last ? a.prediction.last.getTime() : 0;
+      var bLast = b.prediction.last ? b.prediction.last.getTime() : 0;
+      return bLast - aLast || a.item.name.localeCompare(b.item.name, 'pt-BR');
     });
     document.getElementById('planningTable').innerHTML = items.length ? items.map(function (entry, index) {
       var prediction = entry.prediction;
