@@ -548,19 +548,6 @@
       font-weight: 800;
     }
 
-    .record-note {
-      margin: 8px 0 10px;
-      padding: 7px 9px;
-      border: 1px solid #d9e4ed;
-      border-left: 3px solid var(--gold);
-      border-radius: 5px;
-      background: #fbfdff;
-      color: #4f6076;
-      font-size: 9px;
-      font-style: italic;
-      line-height: 1.35;
-    }
-
     .record-links {
       display: flex;
       flex-wrap: wrap;
@@ -1072,7 +1059,6 @@
       }
 
       function renderRecord(record, repeatInfo) {
-        var note = record.observacoes ? '<div class="record-note"><strong>Observações:</strong> ' + escapeHtml(record.observacoes) + '</div>' : "";
         var folderLink = record.folderUrl ? '<a class="record-link" href="' + escapeHtml(record.folderUrl) + '" target="_blank" rel="noopener">📂 Abrir pasta com todas as fotos</a>' : "";
         var recordId = String(record.recordId || "");
         var deleteButton = getDeleteCredential(recordId) ? '<button class="delete-record-btn" type="button" data-record-id="' + escapeHtml(recordId) + '" data-record-name="' + escapeHtml(record.predioNome || "esta execução") + '">Deletar</button>' : "";
@@ -1095,7 +1081,6 @@
               '<div class="meta-item"><span class="meta-label">Responsável</span><span class="meta-value">' + escapeHtml(record.responsavel || "Não informado") + '</span></div>' +
               '<div class="meta-item"><span class="meta-label">Fotos</span><span class="meta-value">' + escapeHtml(record.fotosRecebidas || (record.fotos || []).length) + '</span></div>' +
             '</div>' +
-            note +
             '<div class="record-links">' + folderLink + '</div>' +
             renderPhotos(record) +
           '</div>' +
