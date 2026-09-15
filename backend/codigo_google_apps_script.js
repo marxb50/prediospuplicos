@@ -1,44 +1,49 @@
 /**
  * =========================================================================
  * SELIM - COORDENADORIA DE LIMPEZA URBANA DE PARNAMIRIM
- * SISTEMA DE REGISTRO FOTOGRÁFICO DE PRÉDIOS PÚBLICOS
- * Google Apps Script Web App (Backend Serverless Gratuito)
+ * API de registro fotográfico e relatórios de prédios públicos
  * =========================================================================
- * 
- * Este script deve ser copiado e colado no Google Apps Script (script.google.com).
- * Ele executa as seguintes funções automaticamente:
- * 1. Localiza ou cria a pasta principal no Google Drive: "fotos selim predios publicos"
- * 2. Para cada envio do celular, cria uma subpasta exclusiva (ex: "[15/09/2026] UBS BELA PARNAMIRIM")
- * 3. Salva todas as fotos anexadas (até 20 ou mais) dentro desta subpasta
- * 4. Configura o link de visualização da pasta
- * 5. Localiza ou cria a Planilha Google: "Controle de Fotos - Prédios Públicos SELIM"
- * 6. Registra uma nova linha com os dados da vistoria e o LINK ÚNICO da pasta de fotos
- * 7. Retorna a confirmação e o link direto para a tela do celular do usuário.
+ *
+ * A API grava as fotos no Google Drive, registra uma linha por execução na
+ * planilha e entrega os dados completos para a página de relatório A4.
  */
 
-// Nome exato da pasta principal solicitado pelo usuário
 const NOME_PASTA_PRINCIPAL = "fotos selim predios publicos";
 const NOME_PLANILHA = "Controle de Fotos - Prédios Públicos SELIM";
+const NOME_ABA_REGISTROS = "Registros SELIM";
+const FUSO_HORARIO = "GMT-03:00";
 
-/**
- * Responde a requisições GET (Healthcheck para verificar se a API está online)
- */
+const CABECALHOS_REGISTROS = [
+  "Carimbo de Data/Hora",
+  "Data da Execução",
+  "Categoria",
+  "Prédio Público",
+  "Endereço",
+  "Qtd Fotos",
+  "Link da Pasta no Google Drive (Todas as Fotos)",
+  "Responsável",
+  "Observações",
+  "Links Individuais das Fotos"
+];
+
+/** Responde ao healthcheck ou ao pedido de dados do relatório. */
 function doGet(e) {
-  const result = {
+  const parametros = (e && e.parameter) ? e.parameter : {};
+
+  if (parametros.acao === "relatorio" || parametros.action === "report") {
+    return responderJson(obterRelatorio(parametros));
+  }
+
+  return responderJson({
     status: "ok",
     app: "SELIM Prédios Públicos API",
-    versao: "1.0",
+    versao: "1.2",
     dataHoraServidor: new Date().toISOString(),
-    mensagem: "O Web App do Google Apps Script está ativo e pronto para receber fotos."
-  };
-  
-  return ContentService.createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON);
+    mensagem: "O Web App do Google Apps Script está ativo e pronto para receber fotos e relatórios."
+  });
 }
 
-/**
- * Responde a requisições POST vindas do aplicativo mobile
- */
+/** Recebe os dados do aplicativo e salva a execução no Drive e na planilha. */
 function doPost(e) {
   try {
     if (!e || !e.postData || !e.postData.contents) {
@@ -49,36 +54,26 @@ function doPost(e) {
     const categoria = payload.categoria || "Geral";
     const predioNome = payload.predioNome || "Prédio Não Identificado";
     const endereco = payload.endereco || "Endereço não informado";
-    const dataExecucao = payload.dataExecucao || Utilities.formatDate(new Date(), "GMT-03:00", "dd/MM/yyyy");
+    const dataExecucao = payload.dataExecucao || Utilities.formatDate(new Date(), FUSO_HORARIO, "dd/MM/yyyy");
     const responsavel = payload.responsavel || "Não informado";
     const observacoes = payload.observacoes || "";
-    const fotos = payload.fotos || []; // Array de { name, mimeType, base64 }
+    const fotos = payload.fotos || [];
 
-    // 1. Obter ou criar a pasta raiz "fotos selim predios publicos"
     const pastaRaiz = obterOuCriarPastaRaiz(NOME_PASTA_PRINCIPAL);
-
-    // 2. Criar subpasta para esta execução específica (Ex: [15-09-2026] UBS BELA PARNAMIRIM)
     const dataFormatadaPasta = dataExecucao.replace(/\//g, "-").replace(/\./g, "-");
     const nomeSubpasta = `[${dataFormatadaPasta}] ${predioNome}`;
     const subpasta = pastaRaiz.createFolder(nomeSubpasta);
 
-    // Tornar a pasta visível para quem tiver o link (opcional, facilita abrir no celular/computador)
-    try {
-      subpasta.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    } catch (permErr) {
-      Logger.log("Aviso ao definir permissão de compartilhamento: " + permErr.message);
-    }
-
+    compartilharComoLeitura(subpasta);
     const linkPastaDrive = subpasta.getUrl();
-
-    // 3. Salvar cada uma das fotos enviadas dentro da subpasta
+    const linksFotos = [];
     let fotosSalvas = 0;
+
     for (let i = 0; i < fotos.length; i++) {
       const itemFoto = fotos[i];
       if (!itemFoto || !itemFoto.base64) continue;
 
       let base64Limpo = itemFoto.base64;
-      // Remover prefixo de DataURL se existir (ex: data:image/jpeg;base64,...)
       if (base64Limpo.indexOf(",") > -1) {
         base64Limpo = base64Limpo.split(",")[1];
       }
@@ -87,19 +82,19 @@ function doPost(e) {
       const extensao = mimeType.indexOf("png") > -1 ? "png" : "jpg";
       const indiceFormatado = String(i + 1).padStart(2, "0");
       const nomeArquivo = itemFoto.name || `foto_${indiceFormatado}.${extensao}`;
-
       const bytes = Utilities.base64Decode(base64Limpo);
       const blob = Utilities.newBlob(bytes, mimeType, nomeArquivo);
-      subpasta.createFile(blob);
+      const arquivo = subpasta.createFile(blob);
+
+      compartilharComoLeitura(arquivo);
+      linksFotos.push(arquivo.getUrl());
       fotosSalvas++;
     }
 
-    // 4. Registrar linha na Planilha Google Sheets
     const planilha = obterOuCriarPlanilha(pastaRaiz, NOME_PLANILHA);
-    const aba = planilha.getActiveSheet();
-    const timestamp = Utilities.formatDate(new Date(), "GMT-03:00", "dd/MM/yyyy HH:mm:ss");
+    const aba = garantirAbaRegistros(planilha);
+    const timestamp = Utilities.formatDate(new Date(), FUSO_HORARIO, "dd/MM/yyyy HH:mm:ss");
 
-    // Adiciona nova linha na planilha com o link que abre TODAS as fotos
     aba.appendRow([
       timestamp,
       dataExecucao,
@@ -109,11 +104,11 @@ function doPost(e) {
       fotosSalvas,
       linkPastaDrive,
       responsavel,
-      observacoes
+      observacoes,
+      linksFotos.join("\n")
     ]);
 
-    // Retorna resposta de sucesso para o aplicativo
-    const resposta = {
+    return responderJson({
       status: "success",
       message: "Fotos enviadas e registradas com sucesso!",
       categoria: categoria,
@@ -122,77 +117,233 @@ function doPost(e) {
       fotosRecebidas: fotosSalvas,
       folderUrl: linkPastaDrive,
       folderName: nomeSubpasta,
+      photoUrls: linksFotos,
       sheetUrl: planilha.getUrl(),
       timestamp: timestamp
-    };
-
-    return ContentService.createTextOutput(JSON.stringify(resposta))
-      .setMimeType(ContentService.MimeType.JSON);
+    });
 
   } catch (error) {
     Logger.log("Erro no processamento doPost: " + error.toString());
-    const erroResposta = {
+    return responderJson({
+      status: "error",
+      message: error.message || error.toString()
+    });
+  }
+}
+
+/** Monta todos os registros do período solicitado para a tela de relatório. */
+function obterRelatorio(parametros) {
+  try {
+    const pastaRaiz = obterOuCriarPastaRaiz(NOME_PASTA_PRINCIPAL);
+    const arquivoPlanilha = pastaRaiz.getFilesByName(NOME_PLANILHA);
+
+    if (!arquivoPlanilha.hasNext()) {
+      return {
+        status: "success",
+        acao: "relatorio",
+        totalExecucoes: 0,
+        totalFotos: 0,
+        registros: [],
+        mensagem: "Ainda não existem registros na planilha."
+      };
+    }
+
+    const arquivo = arquivoPlanilha.next();
+    const planilha = SpreadsheetApp.openById(arquivo.getId());
+    const aba = garantirAbaRegistros(planilha);
+    const valores = aba.getDataRange().getDisplayValues();
+    const inicio = parametros.inicio ? converterData(parametros.inicio) : null;
+    const fim = parametros.fim ? converterData(parametros.fim) : null;
+    if (fim) fim.setHours(23, 59, 59, 999);
+    const categoriaFiltro = String(parametros.categoria || "").trim().toLowerCase();
+    const registros = [];
+
+    for (let i = 1; i < valores.length; i++) {
+      const linha = valores[i];
+      if (!linha || linha.length < 2 || !linha[1]) continue;
+
+      const dataExecucao = converterData(linha[1]);
+      if (inicio && (!dataExecucao || dataExecucao < inicio)) continue;
+      if (fim && (!dataExecucao || dataExecucao > fim)) continue;
+      if (categoriaFiltro && String(linha[2] || "").trim().toLowerCase() !== categoriaFiltro) continue;
+
+      const pastaUrl = linha[6] || "";
+      const fotos = obterFotosDaPasta(pastaUrl);
+      const linksDaPlanilha = String(linha[9] || "").split(/\s*\n\s*/).filter(Boolean);
+      const fotosCompletas = fotos.length ? fotos : linksDaPlanilha.map(function(url, index) {
+        return {
+          nome: "Foto " + String(index + 1).padStart(2, "0"),
+          url: url,
+          imageUrl: url
+        };
+      });
+
+      registros.push({
+        timestamp: linha[0] || "",
+        dataExecucao: linha[1] || "",
+        dataIso: dataExecucao ? Utilities.formatDate(dataExecucao, FUSO_HORARIO, "yyyy-MM-dd") : "",
+        categoria: linha[2] || "Geral",
+        predioNome: linha[3] || "Prédio não informado",
+        endereco: linha[4] || "Endereço não informado",
+        fotosRecebidas: Number(linha[5]) || fotosCompletas.length,
+        folderUrl: pastaUrl,
+        responsavel: linha[7] || "Não informado",
+        observacoes: linha[8] || "",
+        fotos: fotosCompletas
+      });
+    }
+
+    registros.sort(function(a, b) {
+      return String(b.dataIso || b.dataExecucao).localeCompare(String(a.dataIso || a.dataExecucao));
+    });
+
+    let totalFotos = 0;
+    registros.forEach(function(registro) {
+      totalFotos += registro.fotos.length || registro.fotosRecebidas || 0;
+    });
+
+    return {
+      status: "success",
+      acao: "relatorio",
+      inicio: parametros.inicio || "",
+      fim: parametros.fim || "",
+      categoria: parametros.categoria || "",
+      totalExecucoes: registros.length,
+      totalFotos: totalFotos,
+      registros: registros,
+      sheetUrl: planilha.getUrl()
+    };
+  } catch (error) {
+    Logger.log("Erro ao montar relatório: " + error.toString());
+    return {
       status: "error",
       message: error.message || error.toString()
     };
-    return ContentService.createTextOutput(JSON.stringify(erroResposta))
-      .setMimeType(ContentService.MimeType.JSON);
   }
 }
 
-/**
- * Encontra a pasta raiz no Drive ou cria se ainda não existir
- */
+/** Retorna imagens e links dos arquivos dentro da pasta da execução. */
+function obterFotosDaPasta(pastaUrl) {
+  const pastaId = extrairIdPasta(pastaUrl);
+  if (!pastaId) return [];
+
+  try {
+    const pasta = DriveApp.getFolderById(pastaId);
+    const arquivos = pasta.getFiles();
+    const fotos = [];
+
+    while (arquivos.hasNext()) {
+      const arquivo = arquivos.next();
+      if (String(arquivo.getMimeType()).indexOf("image/") !== 0) continue;
+      const id = arquivo.getId();
+      fotos.push({
+        nome: arquivo.getName(),
+        url: arquivo.getUrl(),
+        imageUrl: "https://drive.google.com/thumbnail?id=" + encodeURIComponent(id) + "&sz=w1400"
+      });
+    }
+
+    fotos.sort(function(a, b) {
+      return a.nome.localeCompare(b.nome, "pt-BR", {numeric: true});
+    });
+    return fotos;
+  } catch (error) {
+    Logger.log("Não foi possível listar fotos da pasta: " + error.toString());
+    return [];
+  }
+}
+
+function extrairIdPasta(url) {
+  const texto = String(url || "");
+  const correspondencia = texto.match(/folders\/([a-zA-Z0-9_-]+)/);
+  return correspondencia ? correspondencia[1] : "";
+}
+
+function converterData(valor) {
+  if (valor instanceof Date && !isNaN(valor.getTime())) return new Date(valor.getTime());
+  const texto = String(valor || "").trim();
+  if (!texto) return null;
+
+  let partes = texto.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (partes) return new Date(Number(partes[1]), Number(partes[2]) - 1, Number(partes[3]));
+
+  partes = texto.match(/^(\d{1,2})[\\/.\-](\d{1,2})[\\/.\-](\d{4})$/);
+  if (!partes) return null;
+
+  const data = new Date(Number(partes[3]), Number(partes[2]) - 1, Number(partes[1]));
+  return isNaN(data.getTime()) ? null : data;
+}
+
+function responderJson(objeto) {
+  return ContentService.createTextOutput(JSON.stringify(objeto))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function compartilharComoLeitura(arquivoOuPasta) {
+  try {
+    arquivoOuPasta.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  } catch (error) {
+    Logger.log("Aviso ao definir compartilhamento: " + error.toString());
+  }
+}
+
 function obterOuCriarPastaRaiz(nomePasta) {
   const pastas = DriveApp.getFoldersByName(nomePasta);
-  if (pastas.hasNext()) {
-    return pastas.next();
-  }
-  return DriveApp.createFolder(nomePasta);
+  return pastas.hasNext() ? pastas.next() : DriveApp.createFolder(nomePasta);
 }
 
-/**
- * Encontra a planilha no Drive ou cria uma nova com cabeçalhos bonitos
- */
 function obterOuCriarPlanilha(pastaDestino, nomePlanilha) {
   const arquivos = pastaDestino.getFilesByName(nomePlanilha);
   if (arquivos.hasNext()) {
-    const arquivo = arquivos.next();
-    return SpreadsheetApp.openById(arquivo.getId());
+    const planilhaExistente = SpreadsheetApp.openById(arquivos.next().getId());
+    garantirAbaRegistros(planilhaExistente);
+    return planilhaExistente;
   }
 
-  // Cria nova planilha
   const novaPlanilha = SpreadsheetApp.create(nomePlanilha);
   const aba = novaPlanilha.getActiveSheet();
-  aba.setName("Registros SELIM");
+  aba.setName(NOME_ABA_REGISTROS);
+  configurarCabecalho(aba);
 
-  // Cabeçalhos oficiais
-  const cabecalhos = [
-    "Carimbo de Data/Hora",
-    "Data da Execução",
-    "Categoria",
-    "Prédio Público",
-    "Endereço",
-    "Qtd Fotos",
-    "Link da Pasta no Google Drive (Todas as Fotos)",
-    "Responsável",
-    "Observações"
-  ];
+  const arquivoSpreadsheet = DriveApp.getFileById(novaPlanilha.getId());
+  pastaDestino.addFile(arquivoSpreadsheet);
+  DriveApp.getRootFolder().removeFile(arquivoSpreadsheet);
+  return novaPlanilha;
+}
 
-  aba.appendRow(cabecalhos);
+function garantirAbaRegistros(planilha) {
+  let aba = planilha.getSheetByName(NOME_ABA_REGISTROS);
+  if (!aba) aba = planilha.getActiveSheet();
 
-  // Estilização dos cabeçalhos (Azul SELIM, texto branco e negrito)
-  const rangeCabecalho = aba.getRange(1, 1, 1, cabecalhos.length);
+  const primeiraLinha = aba.getRange(1, 1, 1, CABECALHOS_REGISTROS.length).getDisplayValues()[0];
+  let precisaAtualizar = false;
+  for (let i = 0; i < CABECALHOS_REGISTROS.length; i++) {
+    if (primeiraLinha[i] !== CABECALHOS_REGISTROS[i]) {
+      precisaAtualizar = true;
+      break;
+    }
+  }
+  if (precisaAtualizar) configurarCabecalho(aba);
+  return aba;
+}
+
+function configurarCabecalho(aba) {
+  aba.getRange(1, 1, 1, CABECALHOS_REGISTROS.length).setValues([CABECALHOS_REGISTROS]);
+  const rangeCabecalho = aba.getRange(1, 1, 1, CABECALHOS_REGISTROS.length);
   rangeCabecalho.setBackground("#005da4");
   rangeCabecalho.setFontColor("#ffffff");
   rangeCabecalho.setFontWeight("bold");
   rangeCabecalho.setHorizontalAlignment("center");
+  rangeCabecalho.setWrap(true);
   aba.setFrozenRows(1);
-
-  // Mover o arquivo criado para dentro da pasta raiz
-  const arquivoSpreadsheet = DriveApp.getFileById(novaPlanilha.getId());
-  pastaDestino.addFile(arquivoSpreadsheet);
-  DriveApp.getRootFolder().removeFile(arquivoSpreadsheet);
-
-  return novaPlanilha;
+  aba.setColumnWidth(1, 150);
+  aba.setColumnWidth(2, 125);
+  aba.setColumnWidth(3, 145);
+  aba.setColumnWidth(4, 260);
+  aba.setColumnWidth(5, 300);
+  aba.setColumnWidth(6, 85);
+  aba.setColumnWidth(7, 320);
+  aba.setColumnWidth(8, 160);
+  aba.setColumnWidth(9, 300);
+  aba.setColumnWidth(10, 420);
 }

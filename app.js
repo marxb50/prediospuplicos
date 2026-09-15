@@ -75,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnOpenDriveFolder = document.getElementById('btnOpenDriveFolder');
   const btnOpenSheet = document.getElementById('btnOpenSheet');
   const btnNewSubmission = document.getElementById('btnNewSubmission');
+  const btnOpenReports = document.getElementById('btnOpenReports');
 
   // Modais e Overlays
   const settingsModal = document.getElementById('settingsModal');
@@ -624,6 +625,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Botão Adicionar Prédio Manual
     btnCustomPlace.addEventListener('click', handleCustomPlace);
+
+    // Relatório A4 com o mesmo endereço configurado para o Google Apps Script
+    btnOpenReports.addEventListener('click', (event) => {
+      event.preventDefault();
+      const reportUrl = new URL('relatorio.html', window.location.href);
+      if (state.scriptUrl) reportUrl.searchParams.set('gas', state.scriptUrl);
+      window.open(reportUrl.toString(), '_blank', 'noopener,noreferrer');
+    });
 
     // Modal de Configurações
     btnOpenSettings.addEventListener('click', () => {

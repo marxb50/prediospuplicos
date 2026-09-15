@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b2545">
+  <title>Relatório de Execuções • SELIM</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 10mm;
+    }
+
+    :root {
+      --navy: #0b2545;
+      --blue: #005da4;
+      --cyan: #00a3e0;
+      --gold: #ffc72c;
+      --green: #11844a;
+      --ink: #162238;
+      --muted: #64748b;
+      --line: #d8e1ea;
+      --soft: #f5f8fb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: #e8edf3;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .screen-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 18px;
+      background: rgba(11, 37, 69, 0.97);
+      color: #fff;
+      box-shadow: 0 3px 14px rgba(11, 37, 69, 0.25);
+    }
+
+    .toolbar-title {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .toolbar-title strong {
+      font-size: 14px;
+      letter-spacing: 0.4px;
+    }
+
+    .toolbar-title span {
+      font-size: 11px;
+      color: #b9c9dd;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .toolbar-btn {
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 8px;
+      background: transparent;
+      color: #fff;
+      padding: 8px 12px;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .toolbar-btn.primary {
+      border-color: var(--gold);
+      background: var(--gold);
+      color: var(--navy);
+    }
+
+    .report-document {
+      width: 210mm;
+      max-width: 100%;
+      min-height: 297mm;
+      margin: 18px auto;
+      padding: 12mm 14mm 10mm;
+      background: #fff;
+      box-shadow: 0 6px 28px rgba(11, 37, 69, 0.16);
+    }
+
+    .report-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding-bottom: 9px;
+      border-bottom: 3px solid var(--navy);
+    }
+
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 185px;
+      max-width: 42%;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .brand-copy {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .brand-copy strong {
+      color: var(--navy);
+      font-size: 13px;
+      letter-spacing: 0.35px;
+      text-transform: uppercase;
+    }
+
+    .brand-copy span {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .report-tag {
+      flex: 0 0 auto;
+      padding: 6px 10px;
+      border: 1px solid #b9cce0;
+      border-radius: 16px;
+      background: #f2f7fc;
+      color: var(--navy);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.45px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .intro {
+      padding: 20px 0 14px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 7px;
+      padding: 5px 10px;
+      border: 1px solid #b9e3f5;
+      border-radius: 14px;
+      background: #eff9fd;
+      color: var(--blue);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .intro h1 {
+      max-width: 700px;
+      margin: 0;
+      color: var(--navy);
+      font-size: 24px;
+      line-height: 1.1;
+      letter-spacing: -0.45px;
+      text-transform: uppercase;
+    }
+
+    .intro p {
+      max-width: 710px;
+      margin: 8px 0 0;
+      color: #53657d;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .filters {
+      margin: 2px 0 17px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--cyan);
+      border-radius: 8px;
+      background: #fbfdff;
+    }
+
+    .filter-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 9px;
+      color: var(--navy);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.45px;
+      text-transform: uppercase;
+    }
+
+    .filter-heading span {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 9px;
+    }
+
+    .preset {
+      border: 1px solid #c7d5e3;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--navy);
+      padding: 6px 9px;
+      font: inherit;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .preset.active,
+    .preset:hover {
+      border-color: var(--blue);
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .filter-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.3fr auto;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.45px;
+      text-transform: uppercase;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 32px;
+      border: 1px solid #c9d6e2;
+      border-radius: 5px;
+      background: #fff;
+      color: var(--ink);
+      padding: 6px 8px;
+      font: inherit;
+      font-size: 11px;
+    }
+
+    .generate-btn {
+      min-height: 32px;
+      border: 0;
+      border-radius: 5px;
+      background: var(--navy);
+      color: #fff;
+      padding: 7px 12px;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .generate-btn:hover {
+      background: var(--blue);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .summary-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 67px;
+      padding: 10px 11px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+    }
+
+    .summary-card::before {
+      position: absolute;
+      inset: 0 0 auto;
+      height: 3px;
+      background: var(--cyan);
+      content: "";
+    }
+
+    .summary-card:nth-child(2)::before { background: var(--navy); }
+    .summary-card:nth-child(3)::before { background: var(--gold); }
+    .summary-card:nth-child(4)::before { background: var(--green); }
+
+    .summary-number {
+      color: var(--navy);
+      font-size: 21px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .summary-label {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.35px;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 15px 0 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--line);
+      color: var(--navy);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.55px;
+      text-transform: uppercase;
+    }
+
+    .section-title::before {
+      width: 4px;
+      height: 17px;
+      border-radius: 2px;
+      background: var(--cyan);
+      content: "";
+    }
+
+    .record-card {
+      margin: 0 0 12px;
+      border: 1px solid #c5d3e0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .record-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--line);
+      background: var(--soft);
+    }
+
+    .record-heading {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .record-number {
+      padding: 4px 7px;
+      border-radius: 4px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+    }
+
+    .record-category {
+      padding: 4px 7px;
+      border: 1px solid #b7e0f1;
+      border-radius: 4px;
+      background: #e9f8fd;
+      color: #076d9f;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.35px;
+      text-transform: uppercase;
+    }
+
+    .record-status {
+      padding: 4px 8px;
+      border: 1px solid #a9e5c2;
+      border-radius: 11px;
+      background: #edfcf2;
+      color: var(--green);
+      font-size: 9px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .record-body {
+      padding: 10px;
+    }
+
+    .record-meta {
+      display: grid;
+      grid-template-columns: 1.5fr 1.2fr 0.8fr;
+      gap: 8px 12px;
+      margin-bottom: 9px;
+    }
+
+    .meta-item {
+      min-width: 0;
+    }
+
+    .meta-item.wide {
+      grid-column: span 2;
+    }
+
+    .meta-label {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--muted);
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.42px;
+      text-transform: uppercase;
+    }
+
+    .meta-value {
+      display: block;
+      overflow-wrap: anywhere;
+      color: var(--ink);
+      font-size: 10px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .meta-item.main .meta-value {
+      color: var(--navy);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .record-note {
+      margin: 8px 0 10px;
+      padding: 7px 9px;
+      border: 1px solid #d9e4ed;
+      border-left: 3px solid var(--gold);
+      border-radius: 5px;
+      background: #fbfdff;
+      color: #4f6076;
+      font-size: 9px;
+      font-style: italic;
+      line-height: 1.35;
+    }
+
+    .record-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 9px;
+    }
+
+    .record-link {
+      color: var(--blue);
+      font-size: 9px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .record-link:hover {
+      text-decoration: underline;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    .photo-card {
+      position: relative;
+      display: block;
+      min-width: 0;
+      overflow: hidden;
+      aspect-ratio: 4 / 3;
+      border: 1px solid #cad8e4;
+      border-radius: 4px;
+      background: #0b2545;
+      text-decoration: none;
+    }
+
+    .photo-card img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .photo-label {
+      position: absolute;
+      right: 3px;
+      bottom: 3px;
+      left: 3px;
+      overflow: hidden;
+      padding: 3px 4px;
+      border-radius: 3px;
+      background: rgba(11, 37, 69, 0.82);
+      color: #fff;
+      font-size: 7px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .empty-photos {
+      padding: 13px;
+      border: 1px dashed #bdccda;
+      border-radius: 5px;
+      background: #f9fbfd;
+      color: var(--muted);
+      font-size: 10px;
+      text-align: center;
+    }
+
+    .empty-state,
+    .loading-state,
+    .error-state {
+      margin: 16px 0;
+      padding: 24px 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdff;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .error-state {
+      border-color: #f3c1c1;
+      background: #fff7f7;
+      color: #a33b3b;
+    }
+
+    .report-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 18px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+      color: #8799ad;
+      font-size: 8px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 740px) {
+      .screen-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 9px;
+      }
+
+      .toolbar-actions {
+        width: 100%;
+      }
+
+      .toolbar-btn {
+        flex: 1;
+        text-align: center;
+      }
+
+      .report-document {
+        width: calc(100% - 18px);
+        margin: 9px auto;
+        padding: 18px 12px;
+      }
+
+      .report-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .brand-logo {
+        width: 205px;
+        max-width: 65%;
+      }
+
+      .filter-fields,
+      .record-meta {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .filter-fields .field:nth-child(3),
+      .filter-fields .generate-btn {
+        grid-column: span 2;
+      }
+
+      .record-meta .wide {
+        grid-column: span 2;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .photo-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .screen-toolbar,
+      .filters {
+        display: none !important;
+      }
+
+      .report-document {
+        width: auto;
+        max-width: none;
+        min-height: 0;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+      }
+
+      .intro {
+        padding-top: 8px;
+      }
+
+      .record-card {
+        box-shadow: none;
+      }
+
+      .photo-card {
+        break-inside: avoid;
+      }
+
+      .report-footer {
+        margin-bottom: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="screen-toolbar">
+    <div class="toolbar-title">
+      <strong>Relatório de execuções</strong>
+      <span>Escolha o período e imprima em A4 ou salve como PDF</span>
+    </div>
+    <div class="toolbar-actions">
+      <a class="toolbar-btn" href="index.html">← Voltar ao cadastro</a>
+      <button id="btnPrint" class="toolbar-btn primary" type="button">🖨 Imprimir / PDF</button>
+    </div>
+  </div>
+
+  <main class="report-document" id="reportDocument">
+    <header class="report-header">
+      <div class="brand-lockup">
+        <img class="brand-logo" src="logo.png" alt="Prefeitura de Parnamirim">
+        <div class="brand-copy">
+          <strong>SELIM • Limpeza Urbana</strong>
+          <span>Prefeitura Municipal de Parnamirim • Rio Grande do Norte</span>
+        </div>
+      </div>
+      <div class="report-tag">Relatório A4</div>
+    </header>
+
+    <section class="intro">
+      <span class="eyebrow">Controle operacional e fotográfico</span>
+      <h1>Relatório de execuções em prédios públicos</h1>
+      <p id="periodText">Carregando registros do período selecionado...</p>
+    </section>
+
+    <section class="filters" aria-label="Filtros do relatório">
+      <div class="filter-heading">
+        <strong>Período do relatório</strong>
+        <span>O relatório mostra todas as execuções encontradas</span>
+      </div>
+      <div class="preset-row">
+        <button class="preset" type="button" data-preset="day">Dia</button>
+        <button class="preset" type="button" data-preset="week">Semana</button>
+        <button class="preset active" type="button" data-preset="month">Mês</button>
+        <button class="preset" type="button" data-preset="custom">Personalizado</button>
+      </div>
+      <div class="filter-fields">
+        <div class="field">
+          <label for="inputInicio">Data inicial</label>
+          <input id="inputInicio" type="date">
+        </div>
+        <div class="field">
+          <label for="inputFim">Data final</label>
+          <input id="inputFim" type="date">
+        </div>
+        <div class="field">
+          <label for="inputCategoria">Categoria</label>
+          <select id="inputCategoria">
+            <option value="">Todas as categorias</option>
+            <option>UBS</option>
+            <option>Escolas Municipais</option>
+            <option>C.I.M.</option>
+            <option>SEMAS</option>
+            <option>Distrito Litoral</option>
+            <option>Outros</option>
+          </select>
+        </div>
+        <button id="btnGenerate" class="generate-btn" type="button">Gerar relatório</button>
+      </div>
+    </section>
+
+    <div id="reportState" class="loading-state">Consultando a planilha Google...</div>
+
+    <div id="reportContent" class="hidden">
+      <section class="summary-grid" aria-label="Resumo do período">
+        <div class="summary-card">
+          <strong id="summaryExecutions" class="summary-number">0</strong>
+          <span class="summary-label">Execuções</span>
+        </div>
+        <div class="summary-card">
+          <strong id="summaryBuildings" class="summary-number">0</strong>
+          <span class="summary-label">Prédios atendidos</span>
+        </div>
+        <div class="summary-card">
+          <strong id="summaryPhotos" class="summary-number">0</strong>
+          <span class="summary-label">Fotos anexadas</span>
+        </div>
+        <div class="summary-card">
+          <strong id="summaryCategories" class="summary-number">0</strong>
+          <span class="summary-label">Categorias</span>
+        </div>
+      </section>
+
+      <div class="section-title">Execuções registradas no período</div>
+      <div id="recordsContainer"></div>
+
+      <footer class="report-footer">
+        <span>Prefeitura Municipal de Parnamirim • SELIM</span>
+        <span id="generatedText">Relatório gerado automaticamente</span>
+      </footer>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbxknOR0N0KFBkfhWYJ5YtH_zj_sNmlMXjmQF6Cy7xmbwmf5Cg3IYs5zFQnP3hIAqkWB/exec";
+      var query = new URLSearchParams(window.location.search);
+      var gasUrl = query.get("gas") || localStorage.getItem("selim_gas_url") || DEFAULT_GAS_URL;
+      var inputInicio = document.getElementById("inputInicio");
+      var inputFim = document.getElementById("inputFim");
+      var inputCategoria = document.getElementById("inputCategoria");
+      var btnGenerate = document.getElementById("btnGenerate");
+      var reportState = document.getElementById("reportState");
+      var reportContent = document.getElementById("reportContent");
+      var recordsContainer = document.getElementById("recordsContainer");
+      var periodText = document.getElementById("periodText");
+
+      function pad(value) {
+        return String(value).padStart(2, "0");
+      }
+
+      function isoDate(date) {
+        return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
+      }
+
+      function setPeriod(type) {
+        var today = new Date();
+        var start = new Date(today);
+        var end = new Date(today);
+
+        if (type === "week") {
+          var day = today.getDay() || 7;
+          start.setDate(today.getDate() - day + 1);
+          end.setDate(start.getDate() + 6);
+        } else if (type === "month") {
+          start = new Date(today.getFullYear(), today.getMonth(), 1);
+          end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        }
+
+        inputInicio.value = isoDate(start);
+        inputFim.value = isoDate(end);
+        document.querySelectorAll(".preset").forEach(function (button) {
+          button.classList.toggle("active", button.getAttribute("data-preset") === type);
+        });
+      }
+
+      function escapeHtml(value) {
+        return String(value === undefined || value === null ? "" : value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function formatDate(value) {
+        var text = String(value || "");
+        if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+          var parts = text.split("-");
+          return parts[2] + "/" + parts[1] + "/" + parts[0];
+        }
+        return text.replace(/[.-]/g, "/");
+      }
+
+      function formatPeriod(start, end) {
+        if (!start && !end) return "Todas as execuções registradas";
+        return "Período consultado: " + formatDate(start) + " a " + formatDate(end);
+      }
+
+      function renderPhotos(record) {
+        var photos = Array.isArray(record.fotos) ? record.fotos : [];
+        if (!photos.length) {
+          return '<div class="empty-photos">Nenhuma foto foi localizada dentro da pasta desta execução. <a class="record-link" href="' + escapeHtml(record.folderUrl || "#") + '" target="_blank" rel="noopener">Abrir pasta no Drive</a></div>';
+        }
+
+        return '<div class="photo-grid">' + photos.map(function (photo, index) {
+          var imageUrl = photo.imageUrl || photo.url || "";
+          var fileUrl = photo.url || imageUrl;
+          var label = photo.nome || ("Foto " + pad(index + 1));
+          return '<a class="photo-card" href="' + escapeHtml(fileUrl) + '" target="_blank" rel="noopener" title="Abrir foto no Google Drive">' +
+            '<img src="' + escapeHtml(imageUrl) + '" alt="' + escapeHtml(label) + '" loading="lazy">' +
+            '<span class="photo-label">' + escapeHtml("Foto " + pad(index + 1)) + '</span>' +
+            '</a>';
+        }).join("") + "</div>";
+      }
+
+      function renderRecord(record, index) {
+        var note = record.observacoes ? '<div class="record-note"><strong>Observações:</strong> ' + escapeHtml(record.observacoes) + '</div>' : "";
+        var folderLink = record.folderUrl ? '<a class="record-link" href="' + escapeHtml(record.folderUrl) + '" target="_blank" rel="noopener">📂 Abrir pasta com todas as fotos</a>' : "";
+        return '<article class="record-card">' +
+          '<div class="record-head">' +
+            '<div class="record-heading">' +
+              '<span class="record-number">EXECUÇÃO ' + pad(index + 1) + '</span>' +
+              '<span class="record-category">' + escapeHtml(record.categoria || "Geral") + '</span>' +
+            '</div>' +
+            '<span class="record-status">● Registrada</span>' +
+          '</div>' +
+          '<div class="record-body">' +
+            '<div class="record-meta">' +
+              '<div class="meta-item main wide"><span class="meta-label">Prédio público</span><span class="meta-value">' + escapeHtml(record.predioNome) + '</span></div>' +
+              '<div class="meta-item wide"><span class="meta-label">Endereço</span><span class="meta-value">' + escapeHtml(record.endereco) + '</span></div>' +
+              '<div class="meta-item"><span class="meta-label">Executado em</span><span class="meta-value">' + escapeHtml(formatDate(record.dataExecucao)) + '</span></div>' +
+              '<div class="meta-item"><span class="meta-label">Responsável</span><span class="meta-value">' + escapeHtml(record.responsavel || "Não informado") + '</span></div>' +
+              '<div class="meta-item"><span class="meta-label">Fotos</span><span class="meta-value">' + escapeHtml(record.fotosRecebidas || (record.fotos || []).length) + '</span></div>' +
+            '</div>' +
+            note +
+            '<div class="record-links">' + folderLink + '</div>' +
+            renderPhotos(record) +
+          '</div>' +
+        '</article>';
+      }
+
+      function showError(message) {
+        reportContent.classList.add("hidden");
+        reportState.className = "error-state";
+        reportState.textContent = message;
+      }
+
+      function renderReport(data, start, end) {
+        if (!data || data.status !== "success") {
+          showError((data && data.message) || "Não foi possível consultar os registros.");
+          return;
+        }
+
+        var records = Array.isArray(data.registros) ? data.registros : [];
+        var buildings = new Set(records.map(function (record) { return record.predioNome; }));
+        var categories = new Set(records.map(function (record) { return record.categoria; }));
+
+        document.getElementById("summaryExecutions").textContent = data.totalExecucoes || records.length;
+        document.getElementById("summaryBuildings").textContent = buildings.size;
+        document.getElementById("summaryPhotos").textContent = data.totalFotos || 0;
+        document.getElementById("summaryCategories").textContent = categories.size;
+        periodText.textContent = formatPeriod(start, end) + (inputCategoria.value ? " • " + inputCategoria.value : "");
+        document.getElementById("generatedText").textContent = "Gerado em " + new Date().toLocaleString("pt-BR");
+
+        if (!records.length) {
+          recordsContainer.innerHTML = '<div class="empty-state">Nenhuma execução foi encontrada para esse período. Escolha outro intervalo ou categoria.</div>';
+        } else {
+          recordsContainer.innerHTML = records.map(renderRecord).join("");
+        }
+
+        reportState.classList.add("hidden");
+        reportContent.classList.remove("hidden");
+      }
+
+      function loadReport() {
+        var start = inputInicio.value;
+        var end = inputFim.value;
+        if (!start || !end) {
+          showError("Informe a data inicial e a data final do relatório.");
+          return;
+        }
+        if (start > end) {
+          showError("A data inicial precisa ser anterior ou igual à data final.");
+          return;
+        }
+
+        reportContent.classList.add("hidden");
+        reportState.className = "loading-state";
+        reportState.textContent = "Consultando a planilha Google e localizando as fotos...";
+        var params = new URLSearchParams({
+          acao: "relatorio",
+          inicio: start,
+          fim: end
+        });
+        if (inputCategoria.value) params.set("categoria", inputCategoria.value);
+
+        fetch(gasUrl + "?" + params.toString())
+          .then(function (response) {
+            if (!response.ok) throw new Error("Resposta HTTP " + response.status);
+            return response.json();
+          })
+          .then(function (data) {
+            renderReport(data, start, end);
+            document.title = "Relatório " + formatDate(start) + " a " + formatDate(end) + " • SELIM";
+          })
+          .catch(function (error) {
+            showError("Não foi possível acessar o Google Apps Script. Verifique a implantação e tente novamente. (" + error.message + ")");
+          });
+      }
+
+      document.querySelectorAll(".preset").forEach(function (button) {
+        button.addEventListener("click", function () {
+          var type = button.getAttribute("data-preset");
+          if (type !== "custom") setPeriod(type);
+          else document.querySelectorAll(".preset").forEach(function (item) { item.classList.remove("active"); });
+        });
+      });
+
+      inputInicio.addEventListener("change", function () {
+        document.querySelectorAll(".preset").forEach(function (item) { item.classList.remove("active"); });
+      });
+      inputFim.addEventListener("change", function () {
+        document.querySelectorAll(".preset").forEach(function (item) { item.classList.remove("active"); });
+      });
+      btnGenerate.addEventListener("click", loadReport);
+      document.getElementById("btnPrint").addEventListener("click", function () { window.print(); });
+
+      setPeriod("month");
+      loadReport();
+    }());
+  </script>
+</body>
+</html>
