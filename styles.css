@@ -966,6 +966,33 @@ textarea.form-control {
   box-shadow: 0 6px 16px rgba(0, 93, 164, 0.45);
 }
 
+.btn-sheet-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 13px 16px;
+  margin-bottom: 14px;
+  border: 1.5px solid #b7dec9;
+  border-radius: var(--radius-lg);
+  color: var(--accent-green);
+  background: var(--accent-green-light);
+  font-size: 15px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-sheet-link:hover {
+  border-color: var(--accent-green);
+  background: #dff1e7;
+}
+
+.btn-sheet-link.disabled-link {
+  pointer-events: none;
+  opacity: 0.55;
+}
+
 .btn-new-submission {
   width: 100%;
   padding: 14px;
@@ -1089,6 +1116,14 @@ textarea.form-control {
 
 .status-dot.connected {
   background: #1b8a5a;
+}
+
+.status-dot.error {
+  background: #ef4444;
+}
+
+.status-dot.checking {
+  background: #f59e0b;
 }
 
 .modal-info-box {

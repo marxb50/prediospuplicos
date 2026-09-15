@@ -6,7 +6,8 @@
  * =========================================================================
  */
 
-// URL Padrão do Google Apps Script (quando definida, todos os celulares conectam automaticamente)
+// URL padrão do Google Apps Script. Depois de publicar o backend, o endereço
+// real fica gravado aqui para que todos os celulares já abram conectados.
 const DEFAULT_GAS_URL = "";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -18,7 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
     selectedPlace: null,
     attachedPhotos: [], // Array de { id, name, base64, mimeType, dataUrl }
     maxPhotos: 20,
-    scriptUrl: localStorage.getItem('selim_gas_url') || DEFAULT_GAS_URL || ''
+    scriptUrl: localStorage.getItem('selim_gas_url') || DEFAULT_GAS_URL || '',
+    isSubmitting: false
   };
 
   // Elementos DOM principais
@@ -71,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const successDataExecucao = document.getElementById('successDataExecucao');
   const successFotosCount = document.getElementById('successFotosCount');
   const btnOpenDriveFolder = document.getElementById('btnOpenDriveFolder');
+  const btnOpenSheet = document.getElementById('btnOpenSheet');
   const btnNewSubmission = document.getElementById('btnNewSubmission');
 
   // Modais e Overlays
@@ -462,6 +465,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // 6. ENVIO PARA O GOOGLE DRIVE E PLANILHA GOOGLE
   // =========================================================================
   btnSubmitForm.addEventListener('click', async () => {
+    if (state.isSubmitting) return;
+
     if (state.attachedPhotos.length === 0) {
       alert('Por favor, anexe pelo menos 1 foto antes de enviar.');
       return;
@@ -471,19 +476,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const responsavel = inputResponsavel.value.trim();
     const observacoes = inputObservacoes.value.trim();
 
-    // Se ainda não houver URL configurada, perguntar ao usuário
+    // Sem uma URL real, não fingir que o registro foi salvo.
     if (!state.scriptUrl) {
-      const choice = confirm(
-        'Você ainda não configurou a URL do Google Apps Script.\n\n' +
-        'Deseja simular o envio em Modo Teste para verificar o fluxo do aplicativo?\n' +
-        '(Para configurar a URL real do Google Drive, clique em CANCELAR e depois no ícone da engrenagem no topo).'
-      );
-
-      if (!choice) {
-        settingsModal.classList.remove('hidden');
-        return;
-      }
+      settingsModal.classList.remove('hidden');
+      setConnectionStatus('error', 'Conexão ainda não configurada');
+      alert('Configure a conexão com o Google Drive na engrenagem antes de enviar.');
+      return;
     }
+
+    state.isSubmitting = true;
+    btnSubmitForm.disabled = true;
 
     // Exibir tela de progresso de upload
     showUploadProgress(
@@ -493,81 +495,59 @@ document.addEventListener('DOMContentLoaded', () => {
     );
 
     try {
-      if (!state.scriptUrl) {
-        // SIMULAÇÃO / MODO TESTE (sem URL do Google Apps Script)
-        await simulateUpload();
-        finishSuccess({
-          folderUrl: 'https://drive.google.com/drive/folders/selim-predios-publicos-demo',
-          predioNome: state.selectedPlace.nome,
-          dataExecucao: dataExecFormatada,
-          fotosCount: state.attachedPhotos.length
-        });
-      } else {
-        // ENVIO REAL PARA O GOOGLE APPS SCRIPT
-        updateUploadPercent(30);
+      // ENVIO REAL PARA O GOOGLE APPS SCRIPT
+      updateUploadPercent(30);
 
-        const payload = {
-          categoria: state.selectedCategoryObj ? state.selectedCategoryObj.categoria_nome : 'Prédio Público',
-          predioNome: state.selectedPlace.nome,
-          endereco: state.selectedPlace.endereco,
-          dataExecucao: dataExecFormatada,
-          responsavel: responsavel,
-          observacoes: observacoes,
-          fotos: state.attachedPhotos.map((p, idx) => ({
-            name: `${state.selectedPlace.nome.replace(/[^a-zA-Z0-9]/g, '_')}_foto_${idx + 1}.jpg`,
-            mimeType: p.mimeType,
-            base64: p.base64
-          }))
-        };
+      const payload = {
+        categoria: state.selectedCategoryObj ? state.selectedCategoryObj.categoria_nome : 'Prédio Público',
+        predioNome: state.selectedPlace.nome,
+        endereco: state.selectedPlace.endereco,
+        dataExecucao: dataExecFormatada,
+        responsavel: responsavel,
+        observacoes: observacoes,
+        fotos: state.attachedPhotos.map((p, idx) => ({
+          name: `${state.selectedPlace.nome.replace(/[^a-zA-Z0-9]/g, '_')}_foto_${idx + 1}.jpg`,
+          mimeType: p.mimeType,
+          base64: p.base64
+        }))
+      };
 
-        updateUploadPercent(60);
+      updateUploadPercent(60);
 
-        const response = await fetch(state.scriptUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'text/plain;charset=utf-8'
-          },
-          body: JSON.stringify(payload)
-        });
+      const response = await fetch(state.scriptUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify(payload)
+      });
 
-        updateUploadPercent(90);
+      updateUploadPercent(90);
 
-        const result = await response.json();
+      const result = await response.json();
 
-        if (result.status === 'success') {
-          updateUploadPercent(100);
-          setTimeout(() => {
-            finishSuccess({
-              folderUrl: result.folderUrl,
-              predioNome: state.selectedPlace.nome,
-              dataExecucao: dataExecFormatada,
-              fotosCount: result.fotosRecebidas || state.attachedPhotos.length
-            });
-          }, 400);
-        } else {
-          throw new Error(result.message || 'Erro desconhecido retornado pelo servidor Google.');
-        }
+      if (result.status !== 'success') {
+        throw new Error(result.message || 'Erro desconhecido retornado pelo servidor Google.');
       }
+
+      updateUploadPercent(100);
+      setTimeout(() => {
+        finishSuccess({
+          folderUrl: result.folderUrl,
+          sheetUrl: result.sheetUrl,
+          predioNome: state.selectedPlace.nome,
+          dataExecucao: dataExecFormatada,
+          fotosCount: result.fotosRecebidas || state.attachedPhotos.length
+        });
+      }, 400);
     } catch (err) {
       hideUploadProgress();
       console.error('Erro no envio:', err);
       alert('Erro ao enviar fotos para o Google Drive:\n' + err.message + '\n\nVerifique sua conexão e a URL configurada.');
+      state.isSubmitting = false;
+      renderPhotosGrid();
     }
   });
-
-  function simulateUpload() {
-    return new Promise((resolve) => {
-      let progress = 10;
-      const interval = setInterval(() => {
-        progress += 20;
-        updateUploadPercent(progress);
-        if (progress >= 100) {
-          clearInterval(interval);
-          setTimeout(resolve, 300);
-        }
-      }, 300);
-    });
-  }
 
   function finishSuccess(info) {
     hideUploadProgress();
@@ -577,6 +557,9 @@ document.addEventListener('DOMContentLoaded', () => {
     successDataExecucao.textContent = info.dataExecucao;
     successFotosCount.textContent = `${info.fotosCount} fotos salvas`;
     btnOpenDriveFolder.href = info.folderUrl;
+    btnOpenSheet.href = info.sheetUrl || '#';
+    btnOpenSheet.classList.toggle('disabled-link', !info.sheetUrl);
+    state.isSubmitting = false;
 
     // Avançar para tela 4
     goToStep(4);
@@ -588,7 +571,9 @@ document.addEventListener('DOMContentLoaded', () => {
   btnNewSubmission.addEventListener('click', () => {
     // Resetar campos de foto e observações
     state.attachedPhotos = [];
+    state.selectedPlace = null;
     inputObservacoes.value = '';
+    inputResponsavel.value = '';
     renderPhotosGrid();
 
     // Voltar para a Tela 1
@@ -656,7 +641,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('selim_gas_url', url);
       testScriptConnection(url);
       settingsModal.classList.add('hidden');
-      alert('Configuração salva com sucesso!');
+      alert(url ? 'Configuração salva. Testando a conexão com o Google...' : 'A conexão foi removida.');
     });
 
     // Fechar modal ao clicar fora
@@ -671,29 +656,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function testScriptConnection(url) {
     if (!url) {
-      statusDot.className = 'status-dot';
-      statusText.textContent = 'Modo Demonstração / Teste Ativo';
+      setConnectionStatus('error', 'Conexão ainda não configurada');
       return;
     }
 
-    statusDot.className = 'status-dot';
-    statusText.textContent = 'Verificando conexão com o Google Drive...';
+    setConnectionStatus('checking', 'Verificando conexão com o Google Drive...');
 
     try {
       const res = await fetch(url);
       const data = await res.json();
       if (data && data.status === 'ok') {
-        statusDot.className = 'status-dot connected';
-        statusText.textContent = 'Conectado ao Google Apps Script!';
+        setConnectionStatus('connected', 'Conectado ao Google Drive e à planilha');
       } else {
-        statusDot.className = 'status-dot';
-        statusText.textContent = 'URL respondeu, mas formato não reconhecido.';
+        setConnectionStatus('error', 'URL respondeu em formato não reconhecido');
       }
     } catch (e) {
-      // Como o Google pode redirecionar, se falhar o GET simples ainda pode funcionar no POST
-      statusDot.className = 'status-dot connected';
-      statusText.textContent = 'URL configurada (Pronto para envio)';
+      setConnectionStatus('error', 'Não foi possível verificar essa URL');
     }
+  }
+
+  function setConnectionStatus(status, message) {
+    statusDot.className = `status-dot ${status}`;
+    statusText.textContent = message;
   }
 
   // Iniciar App

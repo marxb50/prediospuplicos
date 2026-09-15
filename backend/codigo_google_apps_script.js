@@ -122,6 +122,7 @@ function doPost(e) {
       fotosRecebidas: fotosSalvas,
       folderUrl: linkPastaDrive,
       folderName: nomeSubpasta,
+      sheetUrl: planilha.getUrl(),
       timestamp: timestamp
     };
 
