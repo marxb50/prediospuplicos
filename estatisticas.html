@@ -225,7 +225,7 @@
 
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 10px;
       margin-bottom: 13px;
     }
@@ -254,6 +254,7 @@
     .kpi-card:nth-child(3)::before { background: var(--gold); }
     .kpi-card:nth-child(4)::before { background: var(--green); }
     .kpi-card:nth-child(5)::before { background: var(--orange); }
+    .kpi-card:nth-child(6)::before { background: var(--red); }
     .kpi-value { display: block; margin-top: 4px; color: var(--navy); font-size: 25px; font-weight: 900; line-height: 1; }
     .kpi-value.textual { overflow: hidden; font-size: 14px; line-height: 1.2; text-overflow: ellipsis; }
     .kpi-label { display: block; margin-top: 8px; color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
@@ -261,7 +262,7 @@
 
     .insight-strip {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 8px;
       margin-bottom: 14px;
     }
@@ -324,6 +325,19 @@
     .legend-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .legend-value { color: var(--navy); font-weight: 900; }
 
+    .coverage-chart,
+    .frequency-chart { display: flex; flex-direction: column; gap: 10px; }
+    .coverage-row { display: grid; grid-template-columns: minmax(145px, 1.25fr) 2.2fr 72px; align-items: center; gap: 9px; }
+    .coverage-name { overflow: hidden; color: #31435b; font-size: 9px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+    .coverage-track { height: 14px; overflow: hidden; border-radius: 8px; background: #edf2f6; }
+    .coverage-fill { height: 100%; min-width: 3px; border-radius: 8px; background: linear-gradient(90deg, var(--green), #47b979); }
+    .coverage-value { color: var(--navy); font-size: 9px; font-weight: 900; text-align: right; }
+    .frequency-chart { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: end; min-height: 210px; padding-top: 8px; }
+    .frequency-column { display: flex; align-items: center; flex-direction: column; justify-content: flex-end; height: 190px; }
+    .frequency-value { margin-bottom: 5px; color: var(--navy); font-size: 10px; font-weight: 900; }
+    .frequency-bar { width: min(44px, 72%); min-height: 4px; border-radius: 5px 5px 0 0; background: linear-gradient(180deg, var(--gold), var(--orange)); }
+    .frequency-label { margin-top: 7px; color: var(--muted); font-size: 8px; font-weight: 800; text-align: center; text-transform: uppercase; }
+
     .ranking-chart { display: flex; flex-direction: column; gap: 9px; }
     .rank-row { display: grid; grid-template-columns: minmax(175px, 1.2fr) 3fr 44px; align-items: center; gap: 10px; }
     .rank-name { overflow: hidden; color: #31435b; font-size: 9px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
@@ -354,7 +368,6 @@
       .filter-fields { grid-template-columns: 1fr 1fr; }
       .field:nth-child(3), .field:nth-child(4), .generate-btn { grid-column: span 2; }
       .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-      .kpi-card:last-child { grid-column: span 2; }
       .insight-strip, .charts-grid { grid-template-columns: 1fr; }
       .chart-card.full { grid-column: auto; }
       .donut-layout { align-items: flex-start; flex-direction: column; }
@@ -367,11 +380,14 @@
       .toolbar-btn { flex: 1; text-align: center; }
       .intro h1 { font-size: 22px; }
       .kpi-grid { grid-template-columns: 1fr; }
-      .kpi-card:last-child { grid-column: auto; }
       .monthly-chart { gap: 3px; }
       .month-label { font-size: 7px; transform: rotate(-45deg); transform-origin: center; }
       .rank-row { grid-template-columns: 1fr; gap: 4px; }
       .rank-value { text-align: left; }
+      .coverage-row { grid-template-columns: 1fr; gap: 4px; }
+      .coverage-value { text-align: left; }
+      .frequency-chart { grid-template-columns: repeat(3, 1fr); min-height: auto; }
+      .frequency-column { height: 130px; }
     }
 
     @media print {
@@ -418,7 +434,7 @@
     <section class="filters" aria-label="Filtros das estatísticas">
       <div class="filter-heading">
         <strong>Período e recorte</strong>
-        <span>Os cálculos consideram apenas execuções registradas</span>
+        <span>Histórico do Excel e registros recentes do aplicativo, sem duplicidades</span>
       </div>
       <div class="preset-row">
         <button class="preset active" type="button" data-preset="year">Ano atual</button>
@@ -462,15 +478,17 @@
     <div id="dashboardContent" class="hidden">
       <section class="kpi-grid" aria-label="Indicadores principais">
         <div class="kpi-card"><strong id="kpiExecutions" class="kpi-value">0</strong><span class="kpi-label">Execuções no período</span><span id="kpiExecutionsDetail" class="kpi-detail"></span></div>
-        <div class="kpi-card"><strong id="kpiBuildings" class="kpi-value">0</strong><span class="kpi-label">Prédios atendidos</span><span id="kpiBuildingsDetail" class="kpi-detail"></span></div>
-        <div class="kpi-card"><strong id="kpiAverage" class="kpi-value">0</strong><span class="kpi-label">Média por prédio</span><span class="kpi-detail">execuções registradas</span></div>
+        <div class="kpi-card"><strong id="kpiCatalog" class="kpi-value">0</strong><span class="kpi-label">Prédios cadastrados</span><span id="kpiCatalogDetail" class="kpi-detail"></span></div>
+        <div class="kpi-card"><strong id="kpiCoverage" class="kpi-value">0%</strong><span class="kpi-label">Cobertura no período</span><span id="kpiCoverageDetail" class="kpi-detail"></span></div>
+        <div class="kpi-card"><strong id="kpiNever" class="kpi-value">0</strong><span class="kpi-label">Sem execução no período</span><span id="kpiNeverDetail" class="kpi-detail"></span></div>
         <div class="kpi-card"><strong id="kpiLeader" class="kpi-value textual">—</strong><span class="kpi-label">Maior frequência</span><span id="kpiLeaderDetail" class="kpi-detail"></span></div>
-        <div class="kpi-card"><strong id="kpiAttention" class="kpi-value">0</strong><span class="kpi-label">Revisão recomendada</span><span class="kpi-detail">previsões vencidas</span></div>
+        <div class="kpi-card"><strong id="kpiAttention" class="kpi-value">0</strong><span class="kpi-label">Atenção no planejamento</span><span class="kpi-detail">sem histórico ou previsão vencida</span></div>
       </section>
 
       <section class="insight-strip" aria-label="Destaques do período">
         <div id="insightFrequency" class="insight"></div>
         <div id="insightMonth" class="insight"></div>
+        <div id="insightCoverage" class="insight"></div>
         <div id="insightPlanning" class="insight"></div>
       </section>
 
@@ -481,7 +499,17 @@
         </article>
 
         <article class="chart-card">
-          <div class="card-head"><div><h2>Distribuição por categoria</h2><p>Participação de cada tipo de prédio nas execuções.</p></div><span class="card-badge">Composição</span></div>
+          <div class="card-head"><div><h2>Cobertura por categoria</h2><p>Prédios atendidos em relação ao total cadastrado em cada grupo.</p></div><span class="card-badge">Atendidos / total</span></div>
+          <div id="coverageChart" class="coverage-chart" aria-label="Gráfico de cobertura por categoria"></div>
+        </article>
+
+        <article class="chart-card">
+          <div class="card-head"><div><h2>Distribuição da frequência</h2><p>Quantidade de prédios por número de limpezas no período.</p></div><span class="card-badge">Recorrência</span></div>
+          <div id="frequencyChart" class="frequency-chart" aria-label="Gráfico de distribuição da frequência"></div>
+        </article>
+
+        <article class="chart-card">
+          <div class="card-head"><div><h2>Execuções por categoria</h2><p>Participação de cada tipo de prédio no total de limpezas.</p></div><span class="card-badge">Composição</span></div>
           <div class="donut-layout">
             <div id="categoryDonut" class="donut" data-total="0" aria-label="Gráfico por categoria"></div>
             <div id="categoryLegend" class="legend"></div>
@@ -496,7 +524,7 @@
 
       <section class="planning-card">
         <div class="card-head"><div><h2>Planejamento das próximas limpezas</h2><p>Última execução, intervalo estimado e próxima data prevista por prédio.</p></div><span class="card-badge">Agenda estimada</span></div>
-        <div class="planning-note"><strong>Como a previsão é calculada:</strong> usa o intervalo mediano entre execuções do próprio prédio. Sem histórico suficiente, usa a média da categoria; enquanto não houver recorrência, considera um ciclo inicial de 30 dias.</div>
+        <div class="planning-note"><strong>Como a previsão é calculada:</strong> usa o intervalo mediano entre execuções do próprio prédio. Sem histórico suficiente, usa o intervalo mediano da categoria e, na ausência dele, um ciclo inicial de 30 dias. Prédios sem execução aparecem como prioridade.</div>
         <div class="table-wrap">
           <table>
             <thead><tr><th>#</th><th>Prédio público</th><th>Categoria</th><th>Frequência</th><th>Última limpeza</th><th>Intervalo estimado</th><th>Próxima limpeza</th><th>Situação</th></tr></thead>
@@ -506,370 +534,9 @@
       </section>
     </div>
 
-    <footer class="report-footer"><span>Prefeitura Municipal de Parnamirim • SELIM</span><span id="generatedText">Estatísticas geradas automaticamente</span></footer>
+    <footer class="report-footer"><span>Prefeitura Municipal de Parnamirim • SELIM • Histórico 2026 consolidado</span><span id="generatedText">Estatísticas geradas automaticamente</span></footer>
   </main>
 
-  <script>
-    (function () {
-      var DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbxknOR0N0KFBkfhWYJ5YtH_zj_sNmlMXjmQF6Cy7xmbwmf5Cg3IYs5zFQnP3hIAqkWB/exec";
-      var COLORS = ["#005da4", "#00a3e0", "#ffc72c", "#11844a", "#7c57b8", "#df7d16", "#c7352d"];
-      var query = new URLSearchParams(window.location.search);
-      var gasUrl = query.get("gas") || localStorage.getItem("selim_gas_url") || DEFAULT_GAS_URL;
-      var inputInicio = document.getElementById("inputInicio");
-      var inputFim = document.getElementById("inputFim");
-      var inputCategoria = document.getElementById("inputCategoria");
-      var inputPredio = document.getElementById("inputPredio");
-      var btnGenerate = document.getElementById("btnGenerate");
-      var dashboardState = document.getElementById("dashboardState");
-      var dashboardContent = document.getElementById("dashboardContent");
-      var allRecords = [];
-
-      function pad(value) { return String(value).padStart(2, "0"); }
-      function isoDate(date) { return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate()); }
-      function escapeHtml(value) {
-        return String(value === undefined || value === null ? "" : value)
-          .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-      }
-      function normalizeText(value) {
-        return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-      }
-      function parseDate(record) {
-        var iso = String(record.dataIso || "");
-        if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) return new Date(iso + "T12:00:00");
-        var match = String(record.dataExecucao || "").match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/);
-        return match ? new Date(Number(match[3]), Number(match[2]) - 1, Number(match[1]), 12) : null;
-      }
-      function formatDate(date) {
-        if (!date || isNaN(date.getTime())) return "—";
-        return pad(date.getDate()) + "/" + pad(date.getMonth() + 1) + "/" + date.getFullYear();
-      }
-      function formatPeriod() {
-        if (!inputInicio.value && !inputFim.value) return "Todo o histórico registrado";
-        var start = inputInicio.value ? formatDate(new Date(inputInicio.value + "T12:00:00")) : "início";
-        var end = inputFim.value ? formatDate(new Date(inputFim.value + "T12:00:00")) : "hoje";
-        return "Período analisado: " + start + " a " + end;
-      }
-      function daysBetween(a, b) { return Math.max(0, Math.round((b.getTime() - a.getTime()) / 86400000)); }
-      function addDays(date, days) { var copy = new Date(date.getTime()); copy.setDate(copy.getDate() + days); return copy; }
-      function median(values) {
-        if (!values.length) return null;
-        var sorted = values.slice().sort(function (a, b) { return a - b; });
-        var middle = Math.floor(sorted.length / 2);
-        return sorted.length % 2 ? sorted[middle] : Math.round((sorted[middle - 1] + sorted[middle]) / 2);
-      }
-      function plural(count, singular, pluralText) { return count + " " + (count === 1 ? singular : pluralText); }
-
-      function setPeriod(type) {
-        var today = new Date();
-        if (type === "year") {
-          inputInicio.value = today.getFullYear() + "-01-01";
-          inputFim.value = today.getFullYear() + "-12-31";
-        } else if (type === "90days") {
-          var start = new Date(today.getTime());
-          start.setDate(start.getDate() - 89);
-          inputInicio.value = isoDate(start);
-          inputFim.value = isoDate(today);
-        } else if (type === "all") {
-          inputInicio.value = "";
-          inputFim.value = "";
-        }
-        document.querySelectorAll(".preset").forEach(function (button) {
-          button.classList.toggle("active", button.getAttribute("data-preset") === type);
-        });
-      }
-
-      function groupByBuilding(records) {
-        var groups = {};
-        records.forEach(function (record) {
-          var key = normalizeText(record.predioNome || "Prédio não informado");
-          if (!groups[key]) groups[key] = {name: record.predioNome || "Prédio não informado", category: record.categoria || "Geral", records: []};
-          groups[key].records.push(record);
-        });
-        return groups;
-      }
-
-      function filterRecords(records) {
-        var start = inputInicio.value ? new Date(inputInicio.value + "T00:00:00") : null;
-        var end = inputFim.value ? new Date(inputFim.value + "T23:59:59") : null;
-        var category = normalizeText(inputCategoria.value);
-        var building = normalizeText(inputPredio.value);
-        return records.filter(function (record) {
-          var date = parseDate(record);
-          if (start && (!date || date < start)) return false;
-          if (end && (!date || date > end)) return false;
-          if (category && normalizeText(record.categoria) !== category) return false;
-          if (building && normalizeText(record.predioNome) !== building) return false;
-          return true;
-        });
-      }
-
-      function populateBuildingFilter() {
-        var current = inputPredio.value;
-        var category = normalizeText(inputCategoria.value);
-        var buildings = Array.from(new Set(allRecords.filter(function (record) {
-          return !category || normalizeText(record.categoria) === category;
-        }).map(function (record) { return record.predioNome || ""; }).filter(Boolean))).sort(function (a, b) {
-          return a.localeCompare(b, "pt-BR", {numeric: true});
-        });
-        inputPredio.innerHTML = '<option value="">Todos os prédios</option>' + buildings.map(function (name) {
-          return '<option value="' + escapeHtml(name) + '">' + escapeHtml(name) + '</option>';
-        }).join("");
-        if (buildings.indexOf(current) > -1) inputPredio.value = current;
-      }
-
-      function buildModels(records) {
-        var groups = groupByBuilding(records);
-        var categoryGaps = {};
-        var globalGaps = [];
-        Object.keys(groups).forEach(function (key) {
-          var dates = groups[key].records.map(parseDate).filter(Boolean).sort(function (a, b) { return a - b; });
-          var gaps = [];
-          for (var i = 1; i < dates.length; i++) {
-            var gap = daysBetween(dates[i - 1], dates[i]);
-            if (gap > 0) gaps.push(gap);
-          }
-          groups[key].dates = dates;
-          groups[key].gaps = gaps;
-          if (!categoryGaps[groups[key].category]) categoryGaps[groups[key].category] = [];
-          categoryGaps[groups[key].category] = categoryGaps[groups[key].category].concat(gaps);
-          globalGaps = globalGaps.concat(gaps);
-        });
-        return {groups: groups, categoryGaps: categoryGaps, globalGaps: globalGaps};
-      }
-
-      function predictionFor(group, models) {
-        var interval = median(group.gaps);
-        var source = "histórico do prédio";
-        if (!interval) {
-          interval = median(models.categoryGaps[group.category] || []);
-          source = "média da categoria";
-        }
-        if (!interval) {
-          interval = median(models.globalGaps);
-          source = "média geral";
-        }
-        if (!interval) {
-          interval = 30;
-          source = "ciclo inicial";
-        }
-        interval = Math.max(1, Math.round(interval));
-        var last = group.dates[group.dates.length - 1] || null;
-        return {interval: interval, source: source, last: last, next: last ? addDays(last, interval) : null};
-      }
-
-      function buildingRanking(records) {
-        var groups = groupByBuilding(records);
-        return Object.keys(groups).map(function (key) {
-          var dates = groups[key].records.map(parseDate).filter(Boolean).sort(function (a, b) { return a - b; });
-          return {key: key, name: groups[key].name, category: groups[key].category, count: groups[key].records.length, last: dates[dates.length - 1] || null};
-        }).sort(function (a, b) {
-          if (b.count !== a.count) return b.count - a.count;
-          return (b.last ? b.last.getTime() : 0) - (a.last ? a.last.getTime() : 0) || a.name.localeCompare(b.name, "pt-BR");
-        });
-      }
-
-      function renderMonthlyChart(records) {
-        var counts = {};
-        records.forEach(function (record) {
-          var date = parseDate(record);
-          if (!date) return;
-          var key = date.getFullYear() + "-" + pad(date.getMonth() + 1);
-          counts[key] = (counts[key] || 0) + 1;
-        });
-        var start = inputInicio.value ? new Date(inputInicio.value + "T12:00:00") : null;
-        var end = inputFim.value ? new Date(inputFim.value + "T12:00:00") : null;
-        var keys = [];
-        if (start && end) {
-          var cursor = new Date(start.getFullYear(), start.getMonth(), 1, 12);
-          var endMonth = new Date(end.getFullYear(), end.getMonth(), 1, 12);
-          while (cursor <= endMonth && keys.length < 60) {
-            keys.push(cursor.getFullYear() + "-" + pad(cursor.getMonth() + 1));
-            cursor.setMonth(cursor.getMonth() + 1);
-          }
-          if (keys.length > 12) keys = keys.slice(-12);
-        } else {
-          keys = Object.keys(counts).sort().slice(-12);
-        }
-        if (!keys.length) {
-          var today = new Date();
-          keys = [today.getFullYear() + "-" + pad(today.getMonth() + 1)];
-        }
-        var max = Math.max.apply(null, keys.map(function (key) { return counts[key] || 0; }).concat([1]));
-        document.getElementById("monthlyChart").innerHTML = keys.map(function (key) {
-          var parts = key.split("-");
-          var date = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
-          var value = counts[key] || 0;
-          var height = value ? Math.max(8, Math.round((value / max) * 150)) : 3;
-          var label = date.toLocaleDateString("pt-BR", {month: "short"}).replace(".", "") + "/" + String(parts[0]).slice(-2);
-          return '<div class="month-column" title="' + escapeHtml(label + ": " + value) + '"><span class="month-value">' + value + '</span><div class="month-bar" style="height:' + height + 'px"></div><span class="month-label">' + escapeHtml(label) + '</span></div>';
-        }).join("");
-        return counts;
-      }
-
-      function renderCategoryChart(records) {
-        var counts = {};
-        records.forEach(function (record) { var name = record.categoria || "Geral"; counts[name] = (counts[name] || 0) + 1; });
-        var items = Object.keys(counts).map(function (name) { return {name: name, value: counts[name]}; }).sort(function (a, b) { return b.value - a.value; });
-        var total = records.length;
-        var current = 0;
-        var segments = items.map(function (item, index) {
-          var start = current;
-          current += total ? (item.value / total) * 100 : 0;
-          return COLORS[index % COLORS.length] + " " + start.toFixed(2) + "% " + current.toFixed(2) + "%";
-        });
-        var donut = document.getElementById("categoryDonut");
-        donut.style.background = segments.length ? "conic-gradient(" + segments.join(",") + ")" : "#e8eef4";
-        donut.setAttribute("data-total", String(total));
-        document.getElementById("categoryLegend").innerHTML = items.length ? items.map(function (item, index) {
-          var percent = total ? Math.round((item.value / total) * 100) : 0;
-          return '<div class="legend-item"><span class="legend-dot" style="background:' + COLORS[index % COLORS.length] + '"></span><span class="legend-name" title="' + escapeHtml(item.name) + '">' + escapeHtml(item.name) + '</span><span class="legend-value">' + item.value + ' · ' + percent + '%</span></div>';
-        }).join("") : '<div class="empty-state">Sem categorias no período.</div>';
-      }
-
-      function renderRankingChart(ranking) {
-        var top = ranking.slice(0, 10);
-        var max = top.length ? top[0].count : 1;
-        document.getElementById("rankingChart").innerHTML = top.length ? top.map(function (item, index) {
-          var width = Math.max(3, Math.round((item.count / max) * 100));
-          return '<div class="rank-row"><span class="rank-name" title="' + escapeHtml(item.name) + '">' + (index + 1) + 'º · ' + escapeHtml(item.name) + '</span><div class="rank-track"><div class="rank-fill" style="width:' + width + '%"></div></div><span class="rank-value">' + plural(item.count, "vez", "vezes") + '</span></div>';
-        }).join("") : '<div class="empty-state">Sem execuções no período selecionado.</div>';
-      }
-
-      function statusFor(nextDate) {
-        if (!nextDate) return {className: "ok", label: "Sem previsão"};
-        var today = new Date();
-        today.setHours(0, 0, 0, 0);
-        var next = new Date(nextDate.getTime());
-        next.setHours(0, 0, 0, 0);
-        var difference = Math.ceil((next - today) / 86400000);
-        if (difference < 0) return {className: "overdue", label: "Atrasada há " + Math.abs(difference) + " dias"};
-        if (difference <= 7) return {className: "soon", label: difference === 0 ? "Prevista para hoje" : "Em " + difference + " dias"};
-        return {className: "ok", label: "Prevista"};
-      }
-
-      function renderPlanning(ranking, models) {
-        var overdue = 0;
-        var rows = ranking.map(function (item, index) {
-          var group = models.groups[item.key];
-          var prediction = predictionFor(group, models);
-          var status = statusFor(prediction.next);
-          if (status.className === "overdue") overdue++;
-          return '<tr><td class="position">' + (index + 1) + 'º</td><td><strong>' + escapeHtml(item.name) + '</strong></td><td>' + escapeHtml(item.category) + '</td><td>' + plural(item.count, "execução", "execuções") + '</td><td>' + formatDate(prediction.last) + '</td><td>' + prediction.interval + ' dias<br><small>' + escapeHtml(prediction.source) + '</small></td><td><strong>' + formatDate(prediction.next) + '</strong></td><td><span class="status ' + status.className + '">' + escapeHtml(status.label) + '</span></td></tr>';
-        }).join("");
-        document.getElementById("planningTable").innerHTML = rows || '<tr><td colspan="8"><div class="empty-state">Sem prédios para planejar neste período.</div></td></tr>';
-        return overdue;
-      }
-
-      function renderDashboard() {
-        populateBuildingFilter();
-        var records = filterRecords(allRecords);
-        var ranking = buildingRanking(records);
-        var models = buildModels(allRecords);
-        var monthlyCounts = renderMonthlyChart(records);
-        renderCategoryChart(records);
-        renderRankingChart(ranking);
-        var overdue = renderPlanning(ranking, models);
-        var average = ranking.length ? records.length / ranking.length : 0;
-        var leader = ranking[0] || null;
-        var monthEntries = Object.keys(monthlyCounts).map(function (key) { return {key: key, value: monthlyCounts[key]}; }).sort(function (a, b) { return b.value - a.value || a.key.localeCompare(b.key); });
-        var bestMonth = monthEntries[0] || null;
-        var bestMonthLabel = "—";
-        if (bestMonth && bestMonth.value) {
-          var parts = bestMonth.key.split("-");
-          bestMonthLabel = new Date(Number(parts[0]), Number(parts[1]) - 1, 1).toLocaleDateString("pt-BR", {month: "long", year: "numeric"});
-        }
-
-        document.getElementById("kpiExecutions").textContent = records.length;
-        document.getElementById("kpiExecutionsDetail").textContent = formatPeriod();
-        document.getElementById("kpiBuildings").textContent = ranking.length;
-        document.getElementById("kpiBuildingsDetail").textContent = ranking.length ? "locais com atendimento" : "nenhum local no período";
-        document.getElementById("kpiAverage").textContent = average.toLocaleString("pt-BR", {minimumFractionDigits: 1, maximumFractionDigits: 1});
-        document.getElementById("kpiLeader").textContent = leader ? leader.name : "—";
-        document.getElementById("kpiLeaderDetail").textContent = leader ? plural(leader.count, "execução", "execuções") : "sem dados";
-        document.getElementById("kpiAttention").textContent = overdue;
-        document.getElementById("periodText").textContent = formatPeriod() + (inputCategoria.value ? " • " + inputCategoria.value : "") + (inputPredio.value ? " • " + inputPredio.value : "");
-        document.getElementById("generatedText").textContent = "Gerado em " + new Date().toLocaleString("pt-BR");
-
-        document.getElementById("insightFrequency").innerHTML = leader ? '<strong>Maior frequência:</strong> ' + escapeHtml(leader.name) + ' lidera com ' + plural(leader.count, "execução", "execuções") + ' no período.' : '<strong>Maior frequência:</strong> sem dados para calcular.';
-        document.getElementById("insightMonth").innerHTML = bestMonth && bestMonth.value ? '<strong>Mês de maior atividade:</strong> ' + escapeHtml(bestMonthLabel) + ', com ' + plural(bestMonth.value, "execução", "execuções") + '.' : '<strong>Mês de maior atividade:</strong> sem dados para calcular.';
-        document.getElementById("insightPlanning").innerHTML = overdue ? '<strong>Atenção ao planejamento:</strong> ' + plural(overdue, "prédio está", "prédios estão") + ' com previsão vencida.' : '<strong>Planejamento:</strong> nenhuma previsão vencida entre os prédios exibidos.';
-
-        dashboardState.classList.add("hidden");
-        dashboardContent.classList.remove("hidden");
-      }
-
-      function showError(message) {
-        dashboardContent.classList.add("hidden");
-        dashboardState.className = "error-state";
-        dashboardState.innerHTML = '<strong>' + escapeHtml(message) + '</strong> <button id="btnRetry" class="preset" type="button">Tentar novamente</button>';
-        var retry = document.getElementById("btnRetry");
-        if (retry) retry.addEventListener("click", loadData);
-      }
-
-      function fetchJson(url, params) {
-        var requestParams = new URLSearchParams(params);
-        requestParams.set("_ts", String(Date.now()));
-        var controller = new AbortController();
-        var timeout = setTimeout(function () { controller.abort(); }, 60000);
-        return fetch(url + "?" + requestParams.toString(), {method: "GET", mode: "cors", cache: "no-store", credentials: "omit", signal: controller.signal})
-          .then(function (response) { if (!response.ok) throw new Error("Resposta HTTP " + response.status); return response.text(); })
-          .then(function (text) { try { return JSON.parse(text); } catch (error) { throw new Error("O Google retornou uma resposta inválida."); } })
-          .finally(function () { clearTimeout(timeout); });
-      }
-
-      function loadFromEndpoint(url) {
-        return fetchJson(url, {acao: "estatisticas"}).then(function (data) {
-          if (data && data.status === "success" && Array.isArray(data.registros)) return data;
-          return fetchJson(url, {acao: "relatorio"});
-        });
-      }
-
-      function loadData() {
-        dashboardContent.classList.add("hidden");
-        dashboardState.className = "loading-state";
-        dashboardState.textContent = "Consultando o histórico de limpezas...";
-        var candidates = [gasUrl, DEFAULT_GAS_URL].filter(function (url, index, list) { return url && list.indexOf(url) === index; });
-
-        function tryCandidate(index) {
-          if (index >= candidates.length) throw new Error("O serviço do Google não respondeu.");
-          return loadFromEndpoint(candidates[index]).catch(function (error) {
-            if (index + 1 < candidates.length) return tryCandidate(index + 1);
-            throw error;
-          });
-        }
-
-        tryCandidate(0).then(function (data) {
-          if (!data || data.status !== "success" || !Array.isArray(data.registros)) throw new Error((data && data.message) || "Não foi possível carregar as estatísticas.");
-          allRecords = data.registros;
-          renderDashboard();
-        }).catch(function (error) { showError("Não foi possível gerar as estatísticas. " + error.message); });
-      }
-
-      document.querySelectorAll(".preset").forEach(function (button) {
-        button.addEventListener("click", function () {
-          var type = button.getAttribute("data-preset");
-          if (type !== "custom") setPeriod(type);
-          else document.querySelectorAll(".preset").forEach(function (item) { item.classList.remove("active"); });
-          renderDashboard();
-        });
-      });
-      inputInicio.addEventListener("change", function () { document.querySelectorAll(".preset").forEach(function (item) { item.classList.remove("active"); }); renderDashboard(); });
-      inputFim.addEventListener("change", function () { document.querySelectorAll(".preset").forEach(function (item) { item.classList.remove("active"); }); renderDashboard(); });
-      inputCategoria.addEventListener("change", function () { inputPredio.value = ""; populateBuildingFilter(); renderDashboard(); });
-      inputPredio.addEventListener("change", renderDashboard);
-      btnGenerate.addEventListener("click", renderDashboard);
-      document.getElementById("btnPrint").addEventListener("click", function () { window.print(); });
-
-      if (query.get("inicio") || query.get("fim")) {
-        inputInicio.value = query.get("inicio") || "";
-        inputFim.value = query.get("fim") || "";
-        document.querySelectorAll(".preset").forEach(function (item) { item.classList.remove("active"); });
-      } else {
-        setPeriod("year");
-      }
-      loadData();
-    }());
-  </script>
+  <script src="estatisticas.js"></script>
 </body>
 </html>

@@ -1,0 +1,1665 @@
+{
+  "version": 1,
+  "referenceYear": 2026,
+  "source": "PRÉDIO PÚBLICOS 2026.xlsx",
+  "buildings": [
+    {
+      "id": "escolas-e-m-prof-alzelina-de-sena-valenca-r-joel-imperador-72-rosa-dos-ventos",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROFª ALZELINA DE SENA VALENÇA",
+      "address": "R. JOEL IMPERADOR, 72 - ROSA DOS VENTOS.",
+      "executions": [
+        "2026-02-04",
+        "2026-03-18",
+        "2026-09-02"
+      ]
+    },
+    {
+      "id": "escolas-e-m-prof-antonio-basilio-filho-r-manoel-monteiro-filho-720-passagem-de-areia",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROF° ANTÔNIO BASÍLIO FILHO",
+      "address": "R. MANOEL MONTEIRO FILHO, 720 - PASSAGEM DE AREIA.",
+      "executions": [
+        "2026-07-17"
+      ]
+    },
+    {
+      "id": "escolas-e-m-presidente-arthur-da-costa-e-silva-r-sargento-noberto-marques-936-centro",
+      "category": "Escolas Municipais",
+      "name": "E.M. PRESIDENTE ARTHUR DA COSTA E SILVA",
+      "address": "R. SARGENTO NOBERTO MARQUES,936 - CENTRO.",
+      "executions": [
+        "2026-01-16",
+        "2026-03-25",
+        "2026-05-14",
+        "2026-07-10",
+        "2026-08-21"
+      ]
+    },
+    {
+      "id": "escolas-e-m-augusto-severo-r-sargento-noberto-marques-158-centro",
+      "category": "Escolas Municipais",
+      "name": "E.M. AUGUSTO SEVERO",
+      "address": "R. SARGENTO NOBERTO MARQUES, 158 - CENTRO.",
+      "executions": [
+        "2026-02-05",
+        "2026-05-29",
+        "2026-08-31"
+      ]
+    },
+    {
+      "id": "escolas-e-m-senador-carlos-alberto-de-souza-r-joaquim-alexandrino-saraiva-565-passagem-de",
+      "category": "Escolas Municipais",
+      "name": "E.M. SENADOR CARLOS ALBERTO DE SOUZA",
+      "address": "R. JOAQUIM ALEXANDRINO SARAIVA,565 - PASSAGEM DE AREIA.",
+      "executions": [
+        "2026-03-05",
+        "2026-06-22"
+      ]
+    },
+    {
+      "id": "escolas-e-m-cicero-de-souza-melo-r-rio-branco-32-rosa-dos-ventos",
+      "category": "Escolas Municipais",
+      "name": "E.M. CÍCERO DE SOUZA MELO",
+      "address": "R.RIO BRANCO, 32 - ROSA DOS VENTOS",
+      "executions": [
+        "2026-03-20",
+        "2026-08-12"
+      ]
+    },
+    {
+      "id": "escolas-e-m-edmo-pinheiro-pinto-r-dayana-nascimento-da-silva-170-cajupiranga",
+      "category": "Escolas Municipais",
+      "name": "E.M. EDMO PINHEIRO PINTO",
+      "address": "R. DAYANA NASCIMENTO DA SILVA, 170 -  CAJUPIRANGA.",
+      "executions": [
+        "2026-03-04",
+        "2026-06-15"
+      ]
+    },
+    {
+      "id": "escolas-e-m-brigadeiro-eduardo-gomes-rua-avelos-185-cidade-verde-nova-parnamirim",
+      "category": "Escolas Municipais",
+      "name": "E.M. BRIGADEIRO EDUARDO GOMES",
+      "address": "RUA AVELÓS, 185,CIDADE VERDE - NOVA PARNAMIRIM.",
+      "executions": [
+        "2026-03-17",
+        "2026-06-23",
+        "2026-08-25"
+      ]
+    },
+    {
+      "id": "escolas-e-m-prof-enedina-eduardo-do-nascimento-r-eugenia-palhares-de-oliveira-191-vale-do-so",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROFª ENEDINA EDUARDO DO NASCIMENTO",
+      "address": "R. EUGÊNIA PALHARES DE OLIVEIRA, 191 - VALE DO SOL.",
+      "executions": [
+        "2026-01-09",
+        "2026-02-26",
+        "2026-06-15",
+        "2026-09-03"
+      ]
+    },
+    {
+      "id": "escolas-e-m-prof-eulina-augusta-de-almeida-r-sao-vicente-305-nova-esperanca",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROFª EULINA AUGUSTA DE ALMEIDA",
+      "address": "R. SÃO VICENTE, 305 -  NOVA ESPERANÇA.",
+      "executions": [
+        "2026-07-03"
+      ]
+    },
+    {
+      "id": "escolas-e-m-prof-eva-lucia-bezerra-de-mendonca-r-silvia-bandeira-de-melo-370-parque-de-expos",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROFª EVA LÚCIA BEZERRA DE MENDONÇA",
+      "address": "R. SILVIA BANDEIRA DE MELO,370 - PARQUE DE EXPOSIÇÕES.",
+      "executions": [
+        "2026-02-09",
+        "2026-05-05",
+        "2026-09-08"
+      ]
+    },
+    {
+      "id": "escolas-e-m-prof-francisca-bezerra-de-souza-r-jose-alvares-maciel-215-liberdade",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROFª FRANCISCA BEZERRA DE SOUZA",
+      "address": "R. JOSÉ ÁLVARES MACIEL, 215 - LIBERDADE.",
+      "executions": [
+        "2026-02-11",
+        "2026-05-18",
+        "2026-08-27"
+      ]
+    },
+    {
+      "id": "escolas-e-m-prof-francisca-c-avelino-batista-r-aristofanes-fernandes-38-parque-de-exposico",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROFª FRANCISCA C. AVELINO BATISTA",
+      "address": "R. ARISTÓFANES FERNANDES, 38 - PARQUE DE EXPOSIÇÕES.",
+      "executions": [
+        "2026-02-11",
+        "2026-06-19"
+      ]
+    },
+    {
+      "id": "escolas-e-m-prof-francisca-fernandes-da-rocha-r-pedro-nunes-ferreira-458-monte-castelo",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROFª FRANCISCA FERNANDES DA ROCHA",
+      "address": "R. PEDRO NUNES FERREIRA, 458 - MONTE CASTELO.",
+      "executions": [
+        "2026-03-01",
+        "2026-06-24",
+        "2026-07-31"
+      ]
+    },
+    {
+      "id": "escolas-e-m-historiador-helio-mamede-galvao-r-cicero-jose-dos-santos-453-vale-do-sol",
+      "category": "Escolas Municipais",
+      "name": "E.M. HISTORIADOR HÉLIO MAMEDE GALVÃO",
+      "address": "R. CÍCERO JOSÉ DOS SANTOS, 453 - VALE DO SOL.",
+      "executions": [
+        "2026-04-06",
+        "2026-06-25",
+        "2026-08-27"
+      ]
+    },
+    {
+      "id": "escolas-e-m-prof-homero-de-oliveira-dantas-r-primeiro-de-maio-47-conjunto-parnamirim-ii-",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROFº HOMERO DE OLIVEIRA DANTAS",
+      "address": "R. PRIMEIRO DE MAIO, 47, CONJUNTO PARNAMIRIM II. BOA ESPERANÇA.",
+      "executions": [
+        "2026-05-26",
+        "2026-08-27"
+      ]
+    },
+    {
+      "id": "escolas-e-m-prof-irene-soares-da-silva-r-dr-sadi-mendes-20-monte-castelo",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROFª IRENE SOARES DA SILVA",
+      "address": "R. DR. SADI MENDES, 20 - MONTE CASTELO.",
+      "executions": [
+        "2026-01-23",
+        "2026-07-08",
+        "2026-08-24"
+      ]
+    },
+    {
+      "id": "escolas-e-m-prof-iris-de-almeida-matos-r-feliciano-martins-177-monte-castelo",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROFª ÍRIS DE ALMEIDA MATOS",
+      "address": "R. FELICIANO MARTINS, 177 - MONTE CASTELO.",
+      "executions": [
+        "2026-02-10",
+        "2026-05-14",
+        "2026-08-10"
+      ]
+    },
+    {
+      "id": "escolas-e-m-prof-ivanira-de-vasconcelos-paisinho-av-castor-vieira-regis-424-cohabinal",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROFª IVANIRA DE VASCONCELOS PAISINHO",
+      "address": "AV. CASTOR VIEIRA REGIS, 424 - COHABINAL.",
+      "executions": [
+        "2026-08-21"
+      ]
+    },
+    {
+      "id": "escolas-e-m-prof-jacira-medeiros-de-sousa-silva-r-santa-adelaide-345-nova-esperanca",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROFª JACIRA MEDEIROS DE SOUSA SILVA",
+      "address": "R. SANTA ADELAIDE, 345 -  NOVA ESPERANÇA.",
+      "executions": [
+        "2026-02-20",
+        "2026-06-19",
+        "2026-08-15"
+      ]
+    },
+    {
+      "id": "escolas-e-m-prof-joana-alves-de-lima-r-belo-monte-s-n-jardim-blumenau-cajupiranga",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROFª JOANA ALVES DE LIMA",
+      "address": "R. BELO MONTE, S/N -JARDIM BLUMENAU - CAJUPIRANGA.",
+      "executions": [
+        "2026-03-05",
+        "2026-06-12",
+        "2026-09-09"
+      ]
+    },
+    {
+      "id": "escolas-e-m-joao-gomes-da-costa-neto-r-jose-bonifacio-395-liberdade",
+      "category": "Escolas Municipais",
+      "name": "E.M. JOÃO GOMES DA COSTA NETO",
+      "address": "R. JOSÉ BONIFÁCIO, 395 - LIBERDADE.",
+      "executions": [
+        "2026-02-13",
+        "2026-06-10",
+        "2026-08-04"
+      ]
+    },
+    {
+      "id": "escolas-e-m-administrador-josafa-sisino-machado-av-rio-agua-vermelha-270-emaus",
+      "category": "Escolas Municipais",
+      "name": "E.M. ADMINISTRADOR JOSAFÁ SISINO MACHADO",
+      "address": "AV. RIO ÁGUA VERMELHA, 270 - EMÁUS.",
+      "executions": [
+        "2026-04-01",
+        "2026-06-22",
+        "2026-09-09"
+      ]
+    },
+    {
+      "id": "escolas-e-m-jose-augusto-nunes-r-aspirante-santos-1502-santos-reis",
+      "category": "Escolas Municipais",
+      "name": "E.M. JOSÉ AUGUSTO NUNES",
+      "address": "R. ASPIRANTE SANTOS, 1502 -SANTOS REIS.",
+      "executions": [
+        "2026-03-02",
+        "2026-05-25"
+      ]
+    },
+    {
+      "id": "escolas-e-m-jose-fernandes-rua-jose-pinto-185-monte-castelo",
+      "category": "Escolas Municipais",
+      "name": "E.M. JOSÉ FERNANDES",
+      "address": "RUA JOSÉ PINTO, 185 - MONTE CASTELO.",
+      "executions": [
+        "2026-04-10",
+        "2026-07-17"
+      ]
+    },
+    {
+      "id": "escolas-e-m-prof-jussier-santos-r-garrastazu-medice-265-santa-tereza",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROFº JUSSIER SANTOS",
+      "address": "R. GARRASTAZU MÉDICE, 265 - SANTA TEREZA.",
+      "executions": [
+        "2026-02-05",
+        "2026-04-15",
+        "2026-06-17"
+      ]
+    },
+    {
+      "id": "escolas-e-m-poeta-luiz-carlos-guimaraes-av-ghandi-479-nova-parnamirim",
+      "category": "Escolas Municipais",
+      "name": "E.M POETA LUIZ CARLOS GUIMARÃES",
+      "address": "AV. GHANDI, 479 - NOVA PARNAMIRIM.",
+      "executions": [
+        "2026-01-12",
+        "2026-04-28",
+        "2026-07-21"
+      ]
+    },
+    {
+      "id": "escolas-e-m-prof-luiz-maranhao-filho-av-bela-parnamirim-1175-monte-castelo",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROFº LUIZ MARANHÃO FILHO",
+      "address": "AV. BELA PARNAMIRIM, 1175 - MONTE CASTELO",
+      "executions": [
+        "2026-03-30",
+        "2026-06-16"
+      ]
+    },
+    {
+      "id": "escolas-e-m-prof-luzanira-maria-da-costa-cruz-r-antonio-moreira-76-passagem-de-areia",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROFª LUZANIRA MARIA DA COSTA CRUZ",
+      "address": "R. ANTÔNIO MOREIRA, 76 - PASSAGEM DE AREIA.",
+      "executions": [
+        "2026-05-04",
+        "2026-07-21"
+      ]
+    },
+    {
+      "id": "escolas-e-m-manoel-vicente-de-paiva-rua-canada-285-passagem-de-areia",
+      "category": "Escolas Municipais",
+      "name": "E.M. MANOEL VICENTE DE PAIVA",
+      "address": "RUA CANADÁ, 285 - PASSAGEM DE AREIA.",
+      "executions": [
+        "2026-03-09",
+        "2026-05-19",
+        "2026-07-29"
+      ]
+    },
+    {
+      "id": "escolas-e-m-manoel-machado-r-aeroporto-de-pelotas-140-conj-jardim-aeropo",
+      "category": "Escolas Municipais",
+      "name": "E.M. MANOEL MACHADO",
+      "address": "R. AEROPORTO DE PELOTAS,140- CONJ. JARDIM AEROPORTO, EMAÚS.",
+      "executions": [
+        "2026-03-23",
+        "2026-06-23"
+      ]
+    },
+    {
+      "id": "escolas-e-m-maria-de-jesus-medeiros-de-lima-r-joao-januario-de-carvalho-120-nova-esperanc",
+      "category": "Escolas Municipais",
+      "name": "E.M. MARIA DE JESUS MEDEIROS DE LIMA",
+      "address": "R. JOÃO JANUÁRIO DE CARVALHO, 120 - NOVA ESPERANÇA.",
+      "executions": [
+        "2026-03-13",
+        "2026-06-30"
+      ]
+    },
+    {
+      "id": "escolas-e-m-maria-do-ceu-fernandes-r-dr-sadi-mendes-977-santos-reis",
+      "category": "Escolas Municipais",
+      "name": "E.M. MARIA DO CÉU FERNANDES",
+      "address": "R. DR. SADI MENDES, 977 - SANTOS REIS.",
+      "executions": [
+        "2026-03-18",
+        "2026-05-21",
+        "2026-07-06",
+        "2026-08-17"
+      ]
+    },
+    {
+      "id": "escolas-e-m-maria-francinete-goncalves-maia-r-esplanada-deputado-nelio-dias-1500-nova-par",
+      "category": "Escolas Municipais",
+      "name": "E.M. MARIA FRANCINETE GONÇALVES MAIA",
+      "address": "R. ESPLANADA DEPUTADO NÉLIO DIAS, 1500 - NOVA PARNAMIRIM.",
+      "executions": [
+        "2026-01-23",
+        "2026-04-22",
+        "2026-07-28"
+      ]
+    },
+    {
+      "id": "escolas-e-m-maria-fernandes-saraiva-r-bandeira-junior-218-bela-parnamirim",
+      "category": "Escolas Municipais",
+      "name": "E.M. MARIA FERNANDES SARAIVA",
+      "address": "R. BANDEIRA JÚNIOR, 218 - BELA PARNAMIRIM.",
+      "executions": [
+        "2026-02-20",
+        "2026-08-18"
+      ]
+    },
+    {
+      "id": "escolas-e-m-maura-de-morais-cruz-r-sao-joao-36-emaus",
+      "category": "Escolas Municipais",
+      "name": "E.M. MAURA DE MORAIS CRUZ",
+      "address": "R. SÃO JOÃO, 36 - EMAÚS.",
+      "executions": [
+        "2026-01-14",
+        "2026-03-10",
+        "2026-07-13"
+      ]
+    },
+    {
+      "id": "escolas-e-m-prof-neilza-gomes-de-figueiredo-rua-salgueiro-170-jadim-planalto",
+      "category": "Escolas Municipais",
+      "name": "E.M. PROFª NEILZA GOMES DE FIGUEIREDO",
+      "address": "RUA SALGUEIRO, 170 - JADIM PLANALTO.",
+      "executions": [
+        "2026-04-22",
+        "2026-07-29"
+      ]
+    },
+    {
+      "id": "escolas-e-m-emerito-nestor-lima-r-luiza-maria-da-conceicao-santiago-560-passa",
+      "category": "Escolas Municipais",
+      "name": "E.M. EMÉRITO NESTOR LIMA",
+      "address": "R. LUIZA MARIA DA CONCEIÇÃO SANTIAGO, 560 - PASSAGEM DE AREIA",
+      "executions": [
+        "2026-03-13",
+        "2026-07-16"
+      ]
+    },
+    {
+      "id": "escolas-e-m-nossa-senhora-da-guia-tv-nossa-senhora-da-guia-30-emaus",
+      "category": "Escolas Municipais",
+      "name": "E.M. NOSSA SENHORA DA GUIA",
+      "address": "TV. NOSSA SENHORA DA GUIA, 30 - EMAÚS.",
+      "executions": [
+        "2026-02-19",
+        "2026-05-15",
+        "2026-07-10"
+      ]
+    },
+    {
+      "id": "escolas-e-m-osmundo-farias-av-presidente-getulio-vargas-2073-passagem-de",
+      "category": "Escolas Municipais",
+      "name": "E.M. OSMUNDO FARIAS",
+      "address": "AV. PRESIDENTE GETÚLIO VARGAS, 2073 - PASSAGEM DE AREIA.",
+      "executions": [
+        "2026-01-29",
+        "2026-05-27",
+        "2026-08-07"
+      ]
+    },
+    {
+      "id": "escolas-e-m-jornalista-rubens-manoel-lemos-r-rio-camaragibe-215-emaus",
+      "category": "Escolas Municipais",
+      "name": "E.M. JORNALISTA RUBENS MANOEL LEMOS",
+      "address": "R. RIO CAMARAGIBE, 215 - EMAÚS.",
+      "executions": [
+        "2026-02-09",
+        "2026-05-28",
+        "2026-08-10"
+      ]
+    },
+    {
+      "id": "escolas-e-m-dr-sadi-mendes-sobreira-r-santa-luzia-214-nova-parnamirim",
+      "category": "Escolas Municipais",
+      "name": "E.M. DR. SADI MENDES SOBREIRA",
+      "address": "R. SANTA LUZIA, 214 - NOVA PARNAMIRIM.",
+      "executions": [
+        "2026-07-29"
+      ]
+    },
+    {
+      "id": "escolas-e-m-desembargador-silvino-bezerra-neto-r-delfim-moreira-neto-189-santa-tereza",
+      "category": "Escolas Municipais",
+      "name": "E.M. DESEMBARGADOR SILVINO BEZERRA NETO",
+      "address": "R. DELFIM MOREIRA NETO, 189 - SANTA TEREZA.",
+      "executions": [
+        "2026-02-10",
+        "2026-08-05"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-prof-djanira-freire-da-mota-r-trinta-e-quatro-s-n-cajupiranga",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M. PROFª DJANIRA FREIRE DA MOTA",
+      "address": "R. TRINTA E QUATRO, S/N - CAJUPIRANGA",
+      "executions": [
+        "2026-01-07",
+        "2026-04-06",
+        "2026-06-18",
+        "2026-08-17"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-etenize-xavier-da-silva-angelo-av-presidente-getulio-vargas-2073-passagem-de",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M.  ETENIZE XAVIER DA SILVA ÂNGELO",
+      "address": "AV. PRESIDENTE GETÚLIO VARGAS, 2073 - PASSAGEM DE AREIA.",
+      "executions": [
+        "2026-01-07",
+        "2026-08-21"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-eugenia-palhares-av-senador-duarte-filho-s-n-santos-reis",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M.  EUGÊNIA PALHARES",
+      "address": "AV. SENADOR DUARTE FILHO, S/N - SANTOS REIS.",
+      "executions": [
+        "2026-03-24",
+        "2026-07-15"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-dr-ilson-santos-r-firmino-gomes-de-castro-s-n-vale-do-sol",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M.  DR. ILSON SANTOS",
+      "address": "R. FIRMINO GOMES DE CASTRO, S/N - VALE DO SOL.",
+      "executions": [
+        "2026-02-06",
+        "2026-04-06",
+        "2026-07-13"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-ivania-soraia-da-costa-rua-bagre-01-jockey-club",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M. IVÂNIA SORAIA DA COSTA",
+      "address": "RUA BAGRE, 01 - JOCKEY CLUB.",
+      "executions": [
+        "2026-01-09",
+        "2026-03-06",
+        "2026-05-19",
+        "2026-08-20"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-ivone-maria-dos-santos-r-sargento-noberto-marques-182-centro",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M. IVONE MARIA DOS SANTOS",
+      "address": "R. SARGENTO NOBERTO MARQUES, 182 - CENTRO.",
+      "executions": [
+        "2026-02-04",
+        "2026-08-13"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-jacy-ferreira-de-castro-av-jockey-club-s-n-monte-castelo",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M. JACY FERREIRA DE CASTRO",
+      "address": "AV. JOCKEY CLUB, S/N - MONTE CASTELO.",
+      "executions": [
+        "2026-01-22",
+        "2026-06-08",
+        "2026-09-01"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-joanita-arruda-camara-rua-jose-bomifacio-s-n-liberdade",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M. JOANITA ARRUDA CÂMARA",
+      "address": "RUA JOSÉ BOMIFÁCIO, S/N - LIBERDADE.",
+      "executions": [
+        "2026-02-11",
+        "2026-04-15",
+        "2026-06-12",
+        "2026-08-04"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-prof-judith-aguiar-rua-das-butias-s-n-bela-parnamirim",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M. PROFª JUDITH AGUIAR",
+      "address": "RUA DAS BUTIAS, S/N - BELA PARNAMIRIM.",
+      "executions": [
+        "2026-01-06",
+        "2026-02-19",
+        "2026-05-04",
+        "2026-06-30",
+        "2026-09-02"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-prof-lucia-maria-dos-santos-esplanada-nelio-dias-70-nova-parnamirim",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M. PROFª LÚCIA MARIA DOS SANTOS",
+      "address": "ESPLANADA NÉLIO DIAS, 70 - NOVA PARNAMIRIM.",
+      "executions": [
+        "2026-01-23",
+        "2026-04-22",
+        "2026-07-28"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-mae-sinha-r-vereador-bandeira-junior-s-n-bela-parnamirm",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M. MÃE SINHÁ",
+      "address": "R. VEREADOR BANDEIRA JÚNIOR, S/N - BELA PARNAMIRM.",
+      "executions": [
+        "2026-02-19",
+        "2026-05-25",
+        "2026-08-19"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-maria-dilma-lacerda-r-bertulina-antunes-s-n-vale-do-sol",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M. MARIA DILMA LACERDA",
+      "address": "R. BERTULINA ANTUNES, S/N - VALE DO SOL.",
+      "executions": [
+        "2026-01-12",
+        "2026-03-24",
+        "2026-06-15",
+        "2026-08-13"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-maria-do-socorro-de-araujo-menezes-r-luiz-gomes-s-n-passagem-de-areia",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M. MARIA DO SOCORRO DE ARAÚJO MENEZES",
+      "address": "R. LUIZ GOMES, S/N - PASSAGEM DE AREIA.",
+      "executions": [
+        "2026-02-06",
+        "2026-05-06",
+        "2026-07-29"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-maria-leonor-freitas-do-nascimento-av-brigadeiro-trompowisk-s-n-monte-castelo",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M. MARIA LEONOR FREITAS DO NASCIMENTO",
+      "address": "AV. BRIGADEIRO TROMPOWISK, S/N - MONTE CASTELO.",
+      "executions": [
+        "2026-01-23",
+        "2026-03-06",
+        "2026-04-30",
+        "2026-06-25",
+        "2026-07-21"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-monica-alves-do-amaral-rua-avelos-s-n-nova-parnamirim",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M. MÔNICA ALVES DO AMARAL",
+      "address": "RUA AVELÓS, S/N - NOVA PARNAMIRIM.",
+      "executions": [
+        "2026-03-17",
+        "2026-04-27",
+        "2026-06-23",
+        "2026-08-25"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-romana-santiago-rua-rio-das-contas-178-parque-industrial",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M. ROMANA SANTIAGO",
+      "address": "RUA RIO DAS CONTAS, 178 - PARQUE INDUSTRIAL.",
+      "executions": [
+        "2026-02-09",
+        "2026-05-28",
+        "2026-08-10"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-tio-hermes-rua-sao-paulo-s-n-nova-esperanca",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M. TIO HERMES",
+      "address": "RUA SÃO PAULO, S/N - NOVA ESPERANÇA.",
+      "executions": [
+        "2026-01-07",
+        "2026-03-06",
+        "2026-05-22",
+        "2026-08-27"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-prof-francisca-reinaldo-de-o-fernandes-rua-prof-maria-soleane-de-andrade-s-n-parque-",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M. PROFª FRANCISCA REINALDO DE O. FERNANDES",
+      "address": "RUA PROFª MARIA SOLEANE DE ANDRADE, S/N, PARQUE DAS ORQUÍDEAS",
+      "executions": [
+        "2026-01-07",
+        "2026-04-15",
+        "2026-07-16"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-vionete-sabino-amarante-de-medeiros-r-francisco-ferreira-da-silva-s-n-rosa-dos-ve",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M. VIONETE SABINO AMARANTE DE MEDEIROS",
+      "address": "R. FRANCISCO FERREIRA DA SILVA, S/N - ROSA DOS VENTOS.",
+      "executions": [
+        "2026-01-23",
+        "2026-04-10",
+        "2026-07-14"
+      ]
+    },
+    {
+      "id": "centro-infantil-c-i-m-ivete-maria-ferreira-da-silva-av-paulo-afonso-s-n-santos-reis",
+      "category": "Centros Infantis (C.I.M.)",
+      "name": "C.I.M. IVETE MARIA FERREIRA DA SILVA",
+      "address": "AV. PAULO AFONSO, S/N, SANTOS REIS",
+      "executions": [
+        "2026-01-07",
+        "2026-06-08",
+        "2026-09-01"
+      ]
+    },
+    {
+      "id": "ubs-ubs-bela-parnamirim-r-jose-irineu-antunes-54-bela-parnamirim",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS BELA PARNAMIRIM",
+      "address": "R. JOSÉ IRINEU ANTUNES, 54 - BELA PARNAMIRIM.",
+      "executions": [
+        "2026-01-05",
+        "2026-05-06",
+        "2026-09-04"
+      ]
+    },
+    {
+      "id": "ubs-ubs-boa-esperanca-vereador-teodomiro-barbosa-rua-odilon-braga-n-02-boa-esperanca",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS BOA ESPERANÇA -VEREADOR TEODOMIRO BARBOSA",
+      "address": "RUA ODILON BRAGA , Nº 02 - BOA ESPERANÇA",
+      "executions": [
+        "2026-07-28"
+      ]
+    },
+    {
+      "id": "ubs-ubs-rosa-dos-ventos-caic-rua-candido-martins-dos-santos-s-n-rosa-dos-v",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS ROSA DOS VENTOS CAIC",
+      "address": "RUA CÂNDIDO MARTINS DOS SANTOS, S/N - ROSA DOS VENTOS.",
+      "executions": [
+        "2026-01-06",
+        "2026-03-31",
+        "2026-06-12",
+        "2026-09-01"
+      ]
+    },
+    {
+      "id": "ubs-ubs-cajupiranga-rua-trinta-e-dois-s-n-cajupiranga",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS CAJUPIRANGA",
+      "address": "RUA TRINTA E DOIS, S/N - CAJUPIRANGA",
+      "executions": [
+        "2026-01-07",
+        "2026-04-08",
+        "2026-08-24"
+      ]
+    },
+    {
+      "id": "ubs-ubs-centro-av-comandante-petit-246-boa-esperanca",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS CENTRO",
+      "address": "AV. COMANDANTE PETIT, 246 - BOA ESPERANÇA",
+      "executions": [
+        "2026-03-26",
+        "2026-06-24"
+      ]
+    },
+    {
+      "id": "ubs-ubs-coophab-dr-ernani-rosado-rua-percilio-alves-s-n-coophab-nova-parnamiri",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS COOPHAB - DR. ERNANI ROSADO",
+      "address": "RUA PERCÍLIO ALVES, S/N - COOPHAB- NOVA PARNAMIRIM.",
+      "executions": [
+        "2026-01-21",
+        "2026-04-01",
+        "2026-07-15"
+      ]
+    },
+    {
+      "id": "ubs-ubs-cohabinal-rua-mario-medeiros-06-cohabinal",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS COHABINAL",
+      "address": "RUA Mario Medeiros, 06 - COHABINAL.",
+      "executions": []
+    },
+    {
+      "id": "ubs-ubs-cidade-verde-elba-carvalho-de-lima-rua-araca-633-cidade-verde-nova-parnamirim",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS CIDADE VERDE- ELBA CARVALHO DE LIMA",
+      "address": "RUA ARAÇA, 633- CIDADE VERDE-NOVA PARNAMIRIM",
+      "executions": [
+        "2026-05-08"
+      ]
+    },
+    {
+      "id": "ubs-ubs-emaus-professor-clovis-dos-santos-av-dom-bosco-642-emaus",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS EMAÚS- PROFESSOR CLOVIS DOS SANTOS",
+      "address": "AV. DOM BOSCO, 642 - EMAÚS.",
+      "executions": [
+        "2026-01-22",
+        "2026-02-19",
+        "2026-05-15",
+        "2026-06-13"
+      ]
+    },
+    {
+      "id": "ubs-ubs-jockey-club-dr-andre-nunes-de-aquino-rua-capapeba-s-n-jockey-club",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS JOCKEY CLUB - DR. ANDRÉ NUNES DE AQUINO",
+      "address": "RUA CAPAPEBA, S/N - JOCKEY CLUB.",
+      "executions": [
+        "2026-01-26",
+        "2026-07-22"
+      ]
+    },
+    {
+      "id": "ubs-ubs-jardim-planalto-dr-antonio-ferreira-da-silva-rua-caprichosos-de-pilares-s-n-jardim-planalt",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS JARDIM PLANALTO - DR. ANTÔNIO FERREIRA DA SILVA",
+      "address": "RUA CAPRICHOSOS DE PILARES, S/N - JARDIM PLANALTO.",
+      "executions": [
+        "2026-01-14",
+        "2026-04-22",
+        "2026-07-29"
+      ]
+    },
+    {
+      "id": "ubs-ubs-liberdade-enf-francisco-gomes-da-silva-rua-jose-bonifacio-s-n-liberdade",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS LIBERDADE - ENF. FRANCISCO GOMES DA SILVA",
+      "address": "RUA JOSÉ BONIFÁCIO, S/N - LIBERDADE.",
+      "executions": [
+        "2026-02-11",
+        "2026-03-11",
+        "2026-06-08",
+        "2026-08-03"
+      ]
+    },
+    {
+      "id": "ubs-ubs-monte-castelo-enf-marcelino-agostinho-costa-rua-dr-sadi-mendes-s-n-monte-castelo",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS MONTE CASTELO- ENF. MARCELINO AGOSTINHO COSTA",
+      "address": "RUA DR. SADI MENDES, S/N - MONTE CASTELO.",
+      "executions": [
+        "2026-01-23",
+        "2026-07-08",
+        "2026-08-24"
+      ]
+    },
+    {
+      "id": "ubs-ubs-nova-parnamirim-i-suzete-cavalcante-rua-dos-bem-te-vis-s-n-nova-parnamirim",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS NOVA PARNAMIRIM I - SUZETE CAVALCANTE",
+      "address": "RUA DOS BEM-TE-VIS, S/N - NOVA PARNAMIRIM.",
+      "executions": [
+        "2026-02-04",
+        "2026-03-26"
+      ]
+    },
+    {
+      "id": "ubs-ubs-nova-parnamirim-ii-joao-dias-da-costa-rua-esplanada-nelio-dias-s-n-nova-parnamirim",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS NOVA PARNAMIRIM II- JOÃO DIAS DA COSTA",
+      "address": "RUA ESPLANADA NÉLIO DIAS, S/N - NOVA PARNAMIRIM.",
+      "executions": [
+        "2026-01-23",
+        "2026-04-22",
+        "2026-07-28"
+      ]
+    },
+    {
+      "id": "ubs-ubs-nova-esperanca-i-dr-marcondes-bezerra-de-melo-rua-rosa-fernandes-da-silva-s-n-nova-esperanc",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS NOVA ESPERANÇA I- DR. MARCONDES BEZERRA DE MELO",
+      "address": "RUA ROSA FERNANDES DA SILVA, S/N - NOVA ESPERANÇA.",
+      "executions": [
+        "2026-04-15"
+      ]
+    },
+    {
+      "id": "ubs-ubs-nova-esperanca-ii-santa-julia-dr-ernesto-monteiro-da-costa-rua-santa-catarina-s-n-nova-esperanca",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS NOVA ESPERANÇA II-SANTA JÚLIA - DR. ERNESTO MONTEIRO DA COSTA",
+      "address": "RUA SANTA CATARINA, S/N - NOVA ESPERANÇA.",
+      "executions": [
+        "2026-02-26",
+        "2026-05-12",
+        "2026-08-05"
+      ]
+    },
+    {
+      "id": "ubs-ubs-passagem-de-areia-i-silvino-lamartine-rua-pires-de-campos-s-n-passagem-de-areia",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS PASSAGEM DE AREIA I- SILVINO LAMARTINE",
+      "address": "RUA PIRES DE CAMPOS, S/N,PASSAGEM DE AREIA.",
+      "executions": [
+        "2026-06-12",
+        "2026-08-20"
+      ]
+    },
+    {
+      "id": "ubs-ubs-passagem-de-areia-ii-rua-antonio-moreira-s-n-passagem-de-areia",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS PASSAGEM DE AREIA II",
+      "address": "RUA ANTÔNIO MOREIRA, S/N- PASSAGEM DE AREIA",
+      "executions": [
+        "2026-03-02",
+        "2026-08-20"
+      ]
+    },
+    {
+      "id": "ubs-ubs-parque-industrial-rua-aeroporto-de-pelotas-s-n-parque-industria",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS PARQUE INDUSTRIAL",
+      "address": "RUA AEROPORTO DE PELOTAS, S/N - PARQUE  INDUSTRIAL",
+      "executions": [
+        "2026-03-23",
+        "2026-06-23",
+        "2026-07-13"
+      ]
+    },
+    {
+      "id": "ubs-ubs-parque-das-orquideas-enf-wilson-moreira-menezes-rua-prof-maria-soleane-de-andrade-s-n-pq-das-",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS PARQUE DAS ORQUÍDEAS-ENF. WILSON MOREIRA MENEZES",
+      "address": "RUA PROFº MARIA SOLEANE DE ANDRADE, S/N PQ DAS ORQUIDEAS",
+      "executions": [
+        "2026-01-07",
+        "2026-04-15",
+        "2026-07-16"
+      ]
+    },
+    {
+      "id": "ubs-ubs-parque-de-exposicao-i-rua-alcides-jeronimo-06",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS PARQUE DE EXPOSIÇÃO I",
+      "address": "RUA ALCIDES JERÔNIMO, 06",
+      "executions": []
+    },
+    {
+      "id": "ubs-ubs-vida-nova-parque-de-exposicao-ii-rua-perimetral-ii-s-n",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS  VIDA NOVA PARQUE DE EXPOSIÇÃO II",
+      "address": "RUA PERIMETRAL II ,S/N",
+      "executions": [
+        "2026-02-03",
+        "2026-07-07"
+      ]
+    },
+    {
+      "id": "ubs-ubs-primavera-rua-padre-feijo-352",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS PRIMAVERA",
+      "address": "RUA PADRE FEIJÓ, 352",
+      "executions": [
+        "2026-02-11",
+        "2026-04-17",
+        "2026-06-30"
+      ]
+    },
+    {
+      "id": "ubs-ubs-santos-reis-dr-mario-medeiros-r-capitao-martinho-machado-s-n",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS SANTOS REIS- DR. MARIO MEDEIROS",
+      "address": "R. CAPITÃO MARTINHO MACHADO, S/N",
+      "executions": [
+        "2026-03-02",
+        "2026-07-15"
+      ]
+    },
+    {
+      "id": "ubs-ubs-santa-tereza-armando-alvares-padilha-rua-honorio-martiniano-s-n",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS SANTA TEREZA- ARMANDO ALVARES PADILHA",
+      "address": "RUA HONÓRIO MARTINIANO, S/N",
+      "executions": [
+        "2026-02-10",
+        "2026-08-05"
+      ]
+    },
+    {
+      "id": "ubs-ubs-vale-do-sol-rua-eugenia-palhares-s-n",
+      "category": "Unidades Básicas de Saúde (UBS)",
+      "name": "UBS VALE DO SOL",
+      "address": "RUA EUGÊNIA PALHARES, S/N",
+      "executions": [
+        "2026-01-09",
+        "2026-02-26",
+        "2026-04-29",
+        "2026-06-15",
+        "2026-09-03"
+      ]
+    },
+    {
+      "id": "outros-almoxarifado-da-semec-r-tenente-osorio-1402-santos-reis",
+      "category": "Outros Prédios Públicos",
+      "name": "ALMOXARIFADO DA SEMEC",
+      "address": "R. TENENTE OSÓRIO, 1402, SANTOS REIS",
+      "executions": [
+        "2026-03-11"
+      ]
+    },
+    {
+      "id": "outros-caps-ad-iii-r-tomaz-antonio-gonzaga-n-251-liberdade",
+      "category": "Outros Prédios Públicos",
+      "name": "CAPS AD III",
+      "address": "R. TOMAZ ANTÔNIO GONZAGA,N 251, LIBERDADE",
+      "executions": [
+        "2026-01-16",
+        "2026-03-13",
+        "2026-05-08",
+        "2026-07-20"
+      ]
+    },
+    {
+      "id": "outros-capsi-centro-de-atencao-psicossocial-infanto-juvenil-r-padre-joao-maria-09-cohabinal",
+      "category": "Outros Prédios Públicos",
+      "name": "CAPSi -CENTRO DE ATENÇÃO PSICOSSOCIAL INFANTO JUVENIL",
+      "address": "R. PADRE JOÃO MARIA, 09, COHABINAL",
+      "executions": [
+        "2026-01-29",
+        "2026-03-09",
+        "2026-06-23",
+        "2026-08-13"
+      ]
+    },
+    {
+      "id": "outros-caps-ii-centro-de-atencao-psicossocial-transtorno-mental-r-sargento-amor-do-divino-13-centro",
+      "category": "Outros Prédios Públicos",
+      "name": "CAPS II- CENTRO DE ATENÇÃO PSICOSSOCIAL TRANSTORNO MENTAL",
+      "address": "R. SARGENTO  AMOR DO DIVINO, 13, CENTRO",
+      "executions": [
+        "2026-01-20",
+        "2026-05-12",
+        "2026-07-24"
+      ]
+    },
+    {
+      "id": "outros-casa-de-apoio-de-combate-e-controle-a-dengue-r-otavio-gomes-de-castro-73-centro",
+      "category": "Outros Prédios Públicos",
+      "name": "CASA DE APOIO DE COMBATE E CONTROLE A DENGUE",
+      "address": "R. OTÁVIO GOMES DE CASTRO, 73, CENTRO",
+      "executions": []
+    },
+    {
+      "id": "outros-casa-de-apoio-de-combate-e-controle-a-dengue-r-aeroporto-do-galeao-52-emaus",
+      "category": "Outros Prédios Públicos",
+      "name": "CASA DE APOIO DE COMBATE E CONTROLE A DENGUE",
+      "address": "R. AEROPORTO DO GALEÃO, 52, EMAÚS",
+      "executions": []
+    },
+    {
+      "id": "outros-casa-de-apoio-de-combate-e-controle-a-dengue-r-foz-do-iguacu-143-passagem-de-areia",
+      "category": "Outros Prédios Públicos",
+      "name": "CASA DE APOIO DE COMBATE E CONTROLE A DENGUE",
+      "address": "R. FOZ DO IGUAÇU, 143, PASSAGEM DE AREIA",
+      "executions": []
+    },
+    {
+      "id": "outros-casa-de-apoio-de-combate-e-controle-a-dengue-r-dos-eucaliptos-62-nova-parnamirim",
+      "category": "Outros Prédios Públicos",
+      "name": "CASA DE APOIO DE COMBATE E CONTROLE A DENGUE",
+      "address": "R. DOS EUCALIPTOS, 62, NOVA PARNAMIRIM",
+      "executions": [
+        "2026-05-08"
+      ]
+    },
+    {
+      "id": "outros-casa-de-apoio-de-combate-e-controle-a-dengue-r-padre-joao-maria-17-cohabinal",
+      "category": "Outros Prédios Públicos",
+      "name": "CASA DE APOIO DE COMBATE E CONTROLE A DENGUE",
+      "address": "R. PADRE JOÃO MARIA, 17, COHABINAL",
+      "executions": []
+    },
+    {
+      "id": "outros-ccpar-sadi-mendes-av-comandante-petit-s-n-centro",
+      "category": "Outros Prédios Públicos",
+      "name": "CCPAR SADI MENDES",
+      "address": "AV. COMANDANTE PETIT, S/N, CENTRO",
+      "executions": []
+    },
+    {
+      "id": "outros-centro-de-controle-de-zoonoses-r-tijuca-n-01-lotemento-j-blumenal-cajupirang",
+      "category": "Outros Prédios Públicos",
+      "name": "CENTRO DE CONTROLE DE ZOONOSES",
+      "address": "R. TIJUCA, Nº 01, LOTEMENTO J. BLUMENAL - CAJUPIRANGA",
+      "executions": [
+        "2026-03-25",
+        "2026-07-02"
+      ]
+    },
+    {
+      "id": "outros-coordenadoria-de-vigilancia-ambiental-parque-aristofanes-fernandes",
+      "category": "Outros Prédios Públicos",
+      "name": "COORDENADORIA DE VIGILÂNCIA AMBIENTAL",
+      "address": "PARQUE ARISTOFANES FERNANDES",
+      "executions": [
+        "2026-05-25"
+      ]
+    },
+    {
+      "id": "outros-coordenadoria-do-trabalho-rua-luzia-bezerra-de-lima-n-382-rosa-dos-vent",
+      "category": "Outros Prédios Públicos",
+      "name": "COORDENADORIA DO TRABALHO",
+      "address": "RUA LUZIA BEZERRA DE LIMA, Nº 382, ROSA DOS VENTOS",
+      "executions": [
+        "2026-03-18"
+      ]
+    },
+    {
+      "id": "outros-centro-de-convivencia-da-pessoa-idosa-r-maria-cirilo-472-vale-do-sol",
+      "category": "Outros Prédios Públicos",
+      "name": "CENTRO DE CONVIVÊNCIA DA PESSOA IDOSA",
+      "address": "R. MARIA CIRILO, 472, VALE DO SOL",
+      "executions": [
+        "2026-04-16"
+      ]
+    },
+    {
+      "id": "outros-centro-de-referencia-em-infectologia-r-aspirante-santos-n-santos-reis",
+      "category": "Outros Prédios Públicos",
+      "name": "CENTRO DE REFERÊNCIA EM INFECTOLOGIA",
+      "address": "R. ASPIRANTE SANTOS, /N, SANTOS REIS",
+      "executions": []
+    },
+    {
+      "id": "outros-cipp-centro-integrado-de-psicologia-e-psiquiatria-r-padre-joao-maria-57-cohabinal",
+      "category": "Outros Prédios Públicos",
+      "name": "CIPP- CENTRO INTEGRADO DE PSICOLOGIA E PSIQUIATRIA",
+      "address": "R. PADRE JOÃO MARIA, 57, COHABINAL",
+      "executions": []
+    },
+    {
+      "id": "outros-centro-especializado-em-reabilitacao-r-novo-oriente-s-n-vida-nova",
+      "category": "Outros Prédios Públicos",
+      "name": "CENTRO ESPECIALIZADO EM REABILITAÇÃO",
+      "address": "R. NOVO ORIENTE , S/N, VIDA NOVA",
+      "executions": [
+        "2026-02-03",
+        "2026-03-23",
+        "2026-05-08",
+        "2026-07-13"
+      ]
+    },
+    {
+      "id": "outros-17-dp-de-parnamirim-r-capitao-martinho-machado-157-santos-reis",
+      "category": "Outros Prédios Públicos",
+      "name": "17° DP DE PARNAMIRIM",
+      "address": "R. CAPITÃO MARTINHO MACHADO,157, SANTOS REIS",
+      "executions": []
+    },
+    {
+      "id": "outros-3-batalhao-de-policia-r-bolivia-s-n-passagem-de-areia",
+      "category": "Outros Prédios Públicos",
+      "name": "3º BATALHÃO DE POLÍCIA",
+      "address": "R. BOLIVIA, S/N, PASSAGEM DE AREIA",
+      "executions": []
+    },
+    {
+      "id": "outros-delegacia-especializada-em-atedimento-a-mulher-r-sub-oficial-farias-1487-centro",
+      "category": "Outros Prédios Públicos",
+      "name": "DELEGACIA ESPECIALIZADA EM ATEDIMENTO Á MULHER",
+      "address": "R. SUB OFICIAL FARIAS, 1487, CENTRO",
+      "executions": []
+    },
+    {
+      "id": "outros-dhpp-delegacia-de-homicidio-de-parnamirim-r-francisco-ferreira-neves-n-312-satos-reis",
+      "category": "Outros Prédios Públicos",
+      "name": "DHPP - DELEGACIA DE HOMICIDIO DE PARNAMIRIM",
+      "address": "R. Francisco Ferreira Neves Nº 312 Satos Reis",
+      "executions": []
+    },
+    {
+      "id": "outros-2-distrito-policial-de-parnamirim-r-professor-olavo-montenegron-n-9201",
+      "category": "Outros Prédios Públicos",
+      "name": "2º DISTRITO POLICIAL DE PARNAMIRIM",
+      "address": "R. Professor Olavo Montenegron Nº 9201",
+      "executions": []
+    },
+    {
+      "id": "outros-departamento-de-logistico-da-secretaria-de-saude-r-raimundo-barros-cavalcante-286-monte-castel",
+      "category": "Outros Prédios Públicos",
+      "name": "DEPARTAMENTO DE LOGÍSTICO DA SECRETARIA DE SAÚDE",
+      "address": "R. RAIMUNDO BARROS CAVALCANTE,286, MONTE CASTELO",
+      "executions": [
+        "2026-05-18"
+      ]
+    },
+    {
+      "id": "outros-departamento-de-infra-estrutura-ist-aids-rua-clementino-camara-471-cohabinal",
+      "category": "Outros Prédios Públicos",
+      "name": "DEPARTAMENTO DE INFRA ESTRUTURA IST / AIDS",
+      "address": "RUA CLEMENTINO CÂMARA, 471 - COHABINAL",
+      "executions": [
+        "2026-05-27"
+      ]
+    },
+    {
+      "id": "outros-departamento-de-assistencia-farmaceutica-sesad-daf-r-raimundo-barros-cavalcante-410-monte-castel",
+      "category": "Outros Prédios Públicos",
+      "name": "DEPARTAMENTO DE ASSISTÊNCIA FARMACÊUTICA - SESAD DAF",
+      "address": "R. RAIMUNDO BARROS CAVALCANTE,410, MONTE CASTELO",
+      "executions": []
+    },
+    {
+      "id": "outros-guarda-municipal-de-parnamirim-bairro-santos-reis-r-francisco-ferreira-neves-n-333-satos-reis",
+      "category": "Outros Prédios Públicos",
+      "name": "GUARDA MUNICIPAL DE PARNAMIRIM BAIRRO SANTOS REIS",
+      "address": "R. Francisco Ferreira Neves Nº 333 Satos Reis",
+      "executions": []
+    },
+    {
+      "id": "outros-casa-de-apoio-ao-combate-das-arboviroses-rua-presidente-castelo-branco-27-cohabinal",
+      "category": "Outros Prédios Públicos",
+      "name": "CASA DE APOIO AO COMBATE DAS ARBOVIROSES",
+      "address": "RUA PRESIDENTE CASTELO BRANCO 27, COHABINAL",
+      "executions": [
+        "2026-03-18"
+      ]
+    },
+    {
+      "id": "outros-hospital-e-maternidade-divino-amor-av-tenente-medeiros-145-centro",
+      "category": "Outros Prédios Públicos",
+      "name": "HOSPITAL E MATERNIDADE DIVINO AMOR",
+      "address": "AV. TENENTE MEDEIROS, 145, CENTRO",
+      "executions": [
+        "2026-01-29",
+        "2026-03-26",
+        "2026-06-01"
+      ]
+    },
+    {
+      "id": "outros-laboratorio-central-centro-clinico-sadi-mendes-r-dom-leme-s-n-centro",
+      "category": "Outros Prédios Públicos",
+      "name": "LABORATÓRIO CENTRAL(CENTRO CLÍNICO SADI MENDES)",
+      "address": "R. DOM LEME, S/N, CENTRO",
+      "executions": []
+    },
+    {
+      "id": "outros-pro-sus-av-comandante-petit-246-centro",
+      "category": "Outros Prédios Públicos",
+      "name": "PRO - SUS",
+      "address": "AV. COMANDANTE PETIT, 246, CENTRO",
+      "executions": []
+    },
+    {
+      "id": "outros-samu-r-capitao-martinho-machado-260-santos-reis",
+      "category": "Outros Prédios Públicos",
+      "name": "SAMU",
+      "address": "R. CAPITÃO MARTINHO MACHADO,260, SANTOS REIS",
+      "executions": [
+        "2026-05-27"
+      ]
+    },
+    {
+      "id": "outros-secretaria-municipal-assistecia-social-semas-r-aspirante-santos-n-396-santos-reis",
+      "category": "Outros Prédios Públicos",
+      "name": "SECRETARIA MUNICIPAL ASSISTÊCIA SOCIAL - SEMAS",
+      "address": "R. ASPIRANTE SANTOS, Nº 396, SANTOS REIS",
+      "executions": [
+        "2026-01-13",
+        "2026-03-31"
+      ]
+    },
+    {
+      "id": "outros-secretaria-municipal-de-administracao-e-dos-recursos-humanos-r-altino-vicente-de-paiva-210-edificio-cartie",
+      "category": "Outros Prédios Públicos",
+      "name": "SECRETARIA MUNICIPAL DE ADMINISTRAÇÃO E DOS RECURSOS HUMANOS",
+      "address": "R. ALTINO VICENTE DE PAIVA,210,EDIFICIO CARTIER, M. CASTELO",
+      "executions": [
+        "2026-01-14",
+        "2026-05-18"
+      ]
+    },
+    {
+      "id": "outros-secretaria-municipal-de-saude-sesad-r-altino-vicente-de-paiva-210-edificio-cartie",
+      "category": "Outros Prédios Públicos",
+      "name": "SECRETARIA MUNICIPAL DE SAÚDE - SESAD",
+      "address": "R. ALTINO VICENTE DE PAIVA,210,EDIFICIO CARTIER, M. CASTELO",
+      "executions": []
+    },
+    {
+      "id": "outros-secretaria-municipal-de-seguranca-defesa-social-e-mobilidade-urbana-sesdem-r-das-anturias-129-jardim-planalto",
+      "category": "Outros Prédios Públicos",
+      "name": "SECRETARIA MUNICIPAL DE SEGURANÇA, DEFESA SOCIAL E MOBILIDADE URBANA -SESDEM",
+      "address": "R. DAS ANTÚRIAS,129, JARDIM PLANALTO",
+      "executions": [
+        "2026-02-03",
+        "2026-04-09",
+        "2026-06-25"
+      ]
+    },
+    {
+      "id": "outros-secrtaria-municipal-de-tributacao-r-cicero-fernandes-pimenta-312-santos-reis",
+      "category": "Outros Prédios Públicos",
+      "name": "SECRTARIA MUNICIPAL DE TRIBUTAÇÃO",
+      "address": "R. CÍCERO FERNANDES PIMENTA, 312, SANTOS REIS",
+      "executions": [
+        "2026-04-29",
+        "2026-08-03"
+      ]
+    },
+    {
+      "id": "outros-secretaria-municipal-de-obras-publicas-r-tenente-rufino-dos-santos-684-monte-castelo",
+      "category": "Outros Prédios Públicos",
+      "name": "SECRETARIA MUNICIPAL DE OBRAS PÚBLICAS",
+      "address": "R. TENENTE RUFINO DOS SANTOS 684, MONTE CASTELO",
+      "executions": [
+        "2026-04-16",
+        "2026-08-24"
+      ]
+    },
+    {
+      "id": "outros-secretaria-municipal-da-mulher-e-dos-direitos-humanos-r-jacy-ferreira-de-castro-009-centro",
+      "category": "Outros Prédios Públicos",
+      "name": "SECRETARIA MUNICIPAL DA MULHER E DOS DIREITOS HUMANOS",
+      "address": "R. JACY FERREIRA DE CASTRO, 009, CENTRO",
+      "executions": [
+        "2026-03-17"
+      ]
+    },
+    {
+      "id": "outros-secretaria-municipal-de-educacao-av-joao-xxiii-704-santos-reis",
+      "category": "Outros Prédios Públicos",
+      "name": "SECRETARIA MUNICIPAL DE EDUCAÇÃO",
+      "address": "AV. JOÃO XXIII, 704, SANTOS REIS",
+      "executions": [
+        "2026-04-24"
+      ]
+    },
+    {
+      "id": "outros-secretaria-municipal-de-esporte-e-lazer-r-edgar-dantas-732-santos-reis",
+      "category": "Outros Prédios Públicos",
+      "name": "SECRETARIA MUNICIPAL DE ESPORTE E LAZER",
+      "address": "R. EDGAR DANTAS,732, SANTOS REIS",
+      "executions": [
+        "2026-01-05",
+        "2026-03-19"
+      ]
+    },
+    {
+      "id": "outros-uai-r-tomaz-antonio-gonzaga-n-251-liberdade",
+      "category": "Outros Prédios Públicos",
+      "name": "UAI",
+      "address": "R. TOMAZ ANTÔNIO GONZAGA,N 251, LIBERDADE",
+      "executions": []
+    },
+    {
+      "id": "outros-upa-unidade-de-pronto-atendimento-r-rosa-fernandes-da-silva-s-n-nova-esperanca",
+      "category": "Outros Prédios Públicos",
+      "name": "UPA - UNIDADE DE PRONTO ATENDIMENTO",
+      "address": "R. ROSA FERNANDES DA SILVA, S/N, NOVA ESPERANÇA",
+      "executions": [
+        "2026-01-05",
+        "2026-03-12",
+        "2026-04-28",
+        "2026-06-09",
+        "2026-08-06"
+      ]
+    },
+    {
+      "id": "outros-semurb-secretaria-municipal-de-meio-ambiente-e-desenvolvimento-urbano-r-dr-carlos-matheus-1464-centro",
+      "category": "Outros Prédios Públicos",
+      "name": "SEMURB SECRETARIA MUNICIPAL DE MEIO AMBIENTE E DESENVOLVIMENTO URBANO",
+      "address": "R. DR. CARLOS MATHEUS,1464, CENTRO",
+      "executions": []
+    },
+    {
+      "id": "outros-centro-controle-social-r-sargento-noberto-marques-n-312-centro",
+      "category": "Outros Prédios Públicos",
+      "name": "CENTRO CONTROLE SOCIAL",
+      "address": "R.Sargento Noberto Marques Nº 312, CENTRO",
+      "executions": [
+        "2026-02-04",
+        "2026-03-25",
+        "2026-07-10",
+        "2026-08-21"
+      ]
+    },
+    {
+      "id": "outros-centro-integrado-de-saude-cis-r-aspirante-santos-307-santos-reis",
+      "category": "Outros Prédios Públicos",
+      "name": "CENTRO INTEGRADO DE SAÚDE - CIS",
+      "address": "R. ASPIRANTE SANTOS, 307, SANTOS REIS",
+      "executions": [
+        "2026-03-07",
+        "2026-05-21",
+        "2026-07-03",
+        "2026-08-19"
+      ]
+    },
+    {
+      "id": "outros-junta-de-servico-militar-de-parnamirim-rua-capitao-cezar-59-centro",
+      "category": "Outros Prédios Públicos",
+      "name": "JUNTA DE SERVIÇO MILITAR DE PARNAMIRIM",
+      "address": "RUA CAPITÃO CÉZAR,59,CENTRO",
+      "executions": []
+    },
+    {
+      "id": "outros-casa-da-mamae-feliz-av-tenente-medeiros-145-centro",
+      "category": "Outros Prédios Públicos",
+      "name": "CASA DA MAMÃE FELIZ",
+      "address": "AV. TENENTE MEDEIROS, 145, CENTRO",
+      "executions": [
+        "2026-01-28",
+        "2026-03-31",
+        "2026-06-05"
+      ]
+    },
+    {
+      "id": "outros-auditorio-da-escola-municipal-augusto-severo-rua-sargento-noberto-marques-158-centro",
+      "category": "Outros Prédios Públicos",
+      "name": "AUDITORIO DA ESCOLA MUNICIPAL AUGUSTO SEVERO",
+      "address": "RUA SARGENTO NOBERTO MARQUES, 158, CENTRO",
+      "executions": [
+        "2026-02-05",
+        "2026-05-29",
+        "2026-08-28"
+      ]
+    },
+    {
+      "id": "outros-garagem-da-secretaria-de-assitencia-social-rua-tenente-osorio-n-136",
+      "category": "Outros Prédios Públicos",
+      "name": "GARAGEM DA SECRETARIA DE ASSITÊNCIA SOCIAL",
+      "address": "RUA TENENTE OSÓRIO Nº 136",
+      "executions": [
+        "2026-07-23"
+      ]
+    },
+    {
+      "id": "semas-scfv-santa-tereza-r-presidente-castelo-branco-245-santa-tereza",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "SCFV -  SANTA TEREZA",
+      "address": "R. PRESIDENTE CASTELO BRANCO,245,SANTA TEREZA",
+      "executions": [
+        "2026-01-21",
+        "2026-07-08"
+      ]
+    },
+    {
+      "id": "semas-cras-bela-parnamirim-r-joao-irineu-antunes-s-n-passagem-de-areia",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "CRAS BELA PARNAMIRIM",
+      "address": "R. JOÃO IRINEU ANTUNES, S/Nº, PASSAGEM DE AREIA",
+      "executions": [
+        "2026-01-05",
+        "2026-03-18",
+        "2026-06-08",
+        "2026-08-13"
+      ]
+    },
+    {
+      "id": "semas-cras-monte-castelo-r-preidente-getulio-vargas-132-monte-castelo",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "CRAS MONTE CASTELO",
+      "address": "R. PREIDENTE GETULIO VARGAS, 132, MONTE CASTELO",
+      "executions": []
+    },
+    {
+      "id": "semas-cras-liberdade-estrada-de-cajupiranga-1547-liberdade",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "CRAS LIBERDADE",
+      "address": "ESTRADA DE CAJUPIRANGA, 1547, LIBERDADE",
+      "executions": [
+        "2026-01-20",
+        "2026-02-24",
+        "2026-05-26",
+        "2026-08-24"
+      ]
+    },
+    {
+      "id": "semas-cras-moita-verde-r-do-dourado-s-n-vida-nova",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "CRAS MOITA VERDE",
+      "address": "R. DO DOURADO, S/N, VIDA NOVA",
+      "executions": [
+        "2026-03-24",
+        "2026-05-25",
+        "2026-07-24",
+        "2026-08-18"
+      ]
+    },
+    {
+      "id": "semas-cras-nova-parnamirim-r-das-garcas-15-nova-parnamirim",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "CRAS NOVA PARNAMIRIM",
+      "address": "R. DAS GARÇAS, 15, NOVA PARNAMIRIM",
+      "executions": []
+    },
+    {
+      "id": "semas-cras-parque-industrial-r-rio-taborda-246-parque-industrial",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "CRAS PARQUE INDUSTRIAL",
+      "address": "R. RIO TABORDA, 246, PARQUE INDUSTRIAL",
+      "executions": [
+        "2026-01-09",
+        "2026-02-26",
+        "2026-03-26",
+        "2026-05-07"
+      ]
+    },
+    {
+      "id": "semas-cras-passagem-de-areia-r-elis-regina-424-passagem-de-areia",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "CRAS PASSAGEM DE AREIA",
+      "address": "R. ELIS REGINA, 424, PASSAGEM DE AREIA",
+      "executions": [
+        "2026-03-17",
+        "2026-05-14",
+        "2026-08-20"
+      ]
+    },
+    {
+      "id": "semas-cras-de-pium-r-edgardo-de-medeiros-s-n-pium-litoral",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "CRAS DE PIUM",
+      "address": "R. EDGARDO DE MEDEIROS, S/N, PIUM/LITORAL",
+      "executions": []
+    },
+    {
+      "id": "semas-cras-vale-do-sol-r-bertulina-antunes-s-n-vale-do-sol",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "CRAS VALE DO SOL",
+      "address": "R. BERTULINA ANTUNES, S/N, VALE DO SOL",
+      "executions": [
+        "2026-01-12",
+        "2026-03-24",
+        "2026-06-15",
+        "2026-08-13"
+      ]
+    },
+    {
+      "id": "semas-centro-de-atendimento-assistencial-cas-r-pedro-bezerra-filho-55-santos-reis",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "CENTRO DE ATENDIMENTO ASSISTENCIAL - CAS",
+      "address": "R.  PEDRO BEZERRA FILHO,55, SANTOS REIS",
+      "executions": []
+    },
+    {
+      "id": "semas-centro-de-controle-social-ccs-r-sargento-noberto-marques-312-centro",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "CENTRO DE CONTROLE SOCIAL - CCS",
+      "address": "R. SARGENTO NOBERTO MARQUES, 312, CENTRO",
+      "executions": []
+    },
+    {
+      "id": "semas-albergue-noturno-r-sub-oficial-farias-265-monte-castelo",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "ALBERGUE NOTURNO",
+      "address": "R. SUB OFICIAL FARIAS, 265, MONTE CASTELO",
+      "executions": []
+    },
+    {
+      "id": "semas-centro-pop-r-sargento-noberto-marques-220-centro",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "CENTRO POP",
+      "address": "R. SARGENTO NOBERTO MARQUES, 220, CENTRO",
+      "executions": [
+        "2026-04-27",
+        "2026-06-25",
+        "2026-08-31"
+      ]
+    },
+    {
+      "id": "semas-creas-r-aspirante-santos-239-santos-reis",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "CREAS",
+      "address": "R. ASPIRANTE SANTOS, 239, SANTOS REIS",
+      "executions": [
+        "2026-01-29"
+      ]
+    },
+    {
+      "id": "semas-casa-do-adolescente-r-eduardo-medeiros-19-cohabinal",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "CASA DO ADOLESCENTE",
+      "address": "R. EDUARDO MEDEIROS, 19, COHABINAL",
+      "executions": []
+    },
+    {
+      "id": "semas-centro-dia-para-idosos-r-maria-cirilo-472-vale-do-sol",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "CENTRO DIA PARA IDOSOS",
+      "address": "R. MARIA CIRILO, 472, VALE DO SOL",
+      "executions": [
+        "2026-04-16",
+        "2026-08-07"
+      ]
+    },
+    {
+      "id": "semas-deposito-de-inseviveis-r-jose-cordeiro-lopes-n-312-vale-do-sol",
+      "category": "SEMAS (CRAS / SCFV)",
+      "name": "DEPOSITO DE INSEVÍVEIS",
+      "address": "R. JOSÉ CORDEIRO LOPES Nº 312, VALE DO SOL",
+      "executions": []
+    },
+    {
+      "id": "litoral-e-m-deputado-erivan-franca-av-beira-rio-830-distrito-do-litoral-pirangi-",
+      "category": "Distrito Litoral",
+      "name": "E.M. DEPUTADO ERIVAN FRANÇA",
+      "address": "AV. BEIRA RIO, 830,DISTRITO DO LITORAL -  PIRANGI DO NORTE.",
+      "executions": [
+        "2026-02-06",
+        "2026-03-28",
+        "2026-04-25",
+        "2026-06-19"
+      ]
+    },
+    {
+      "id": "litoral-e-m-raimunda-maria-da-conceicao-av-edgardo-de-medeiros-2130-distrito-litoral-",
+      "category": "Distrito Litoral",
+      "name": "E.M. RAIMUNDA MARIA DA CONCEIÇÃO",
+      "address": "AV. EDGARDO DE MEDEIROS, 2130 - DISTRITO LITORAL - PIUM",
+      "executions": [
+        "2026-02-06",
+        "2026-03-30",
+        "2026-07-20"
+      ]
+    },
+    {
+      "id": "litoral-c-i-m-dona-liquinha-alves-rua-carme-de-souza-s-n-pirangi-do-norte",
+      "category": "Distrito Litoral",
+      "name": "C.I.M. DONA LIQUINHA ALVES",
+      "address": "RUA CARME DE SOUZA, S/N - PIRANGI DO NORTE.",
+      "executions": [
+        "2026-01-30",
+        "2026-05-20",
+        "2026-09-10"
+      ]
+    },
+    {
+      "id": "litoral-c-i-m-santa-luzia-rua-santa-luzia-s-n-pium",
+      "category": "Distrito Litoral",
+      "name": "C.I.M. SANTA LUZIA",
+      "address": "RUA SANTA LUZIA, S/N - PIUM.",
+      "executions": []
+    },
+    {
+      "id": "litoral-scfv-pirangi-do-norte-r-praca-sao-sebastiao-s-n-pirangi-do-norte",
+      "category": "Distrito Litoral",
+      "name": "SCFV - PIRANGI DO NORTE",
+      "address": "R. PRAÇA SÃO SEBASTIÃO, S/N, PIRANGI DO NORTE",
+      "executions": [
+        "2025-06-13",
+        "2026-02-06",
+        "2026-03-30",
+        "2026-05-30",
+        "2026-07-08",
+        "2026-08-22"
+      ]
+    },
+    {
+      "id": "litoral-cras-litoral-r-edgardo-medeiros-s-n-pium",
+      "category": "Distrito Litoral",
+      "name": "CRAS LITORAL",
+      "address": "R. EDGARDO MEDEIROS, S/N, PIUM",
+      "executions": [
+        "2026-02-25",
+        "2026-05-25",
+        "2026-07-28"
+      ]
+    },
+    {
+      "id": "litoral-ubs-pium-rua-santa-luzia-01",
+      "category": "Distrito Litoral",
+      "name": "UBS PIUM",
+      "address": "RUA SANTA LUZIA, 01",
+      "executions": []
+    },
+    {
+      "id": "litoral-ubs-pirangi-do-norte-rua-jose-satero-de-macedo-31",
+      "category": "Distrito Litoral",
+      "name": "UBS PIRANGI DO NORTE",
+      "address": "RUA JOSÉ SATERO DE MACEDO, 31",
+      "executions": [
+        "2026-02-25",
+        "2026-08-28",
+        "2026-09-04"
+      ]
+    },
+    {
+      "id": "litoral-unidade-mista-marcio-marinho-r-maria-cristina-xavier-s-n-pirangi-do-norte",
+      "category": "Distrito Litoral",
+      "name": "UNIDADE MISTA MARCIO MARINHO",
+      "address": "R. MARIA CRISTINA XAVIER, S/N, PIRANGI DO NORTE",
+      "executions": [
+        "2026-03-21",
+        "2026-08-27"
+      ]
+    }
+  ]
+}
