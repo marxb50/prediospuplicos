@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#005da4">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="SELIM Fotos">
+  <title>SELIM • Prédios Públicos - Parnamirim</title>
+  
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Barra Superior Fixa (Header) -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="header-brand">
+        <img src="logo.png" alt="Prefeitura de Parnamirim" class="app-logo">
+        <div class="brand-text">
+          <span class="brand-dept">SELIM • LIMPEZA URBANA</span>
+          <h1 class="brand-title">Prédios Públicos</h1>
+        </div>
+      </div>
+      <button id="btnOpenSettings" class="btn-icon" aria-label="Configurações">
+        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Indicador de Etapas (Passo a Passo) -->
+    <nav class="steps-nav" id="stepsNav">
+      <div class="step-indicator active" data-step="1">
+        <span class="step-num">1</span>
+        <span class="step-label">Categoria</span>
+      </div>
+      <div class="step-line" id="line1"></div>
+      <div class="step-indicator" data-step="2">
+        <span class="step-num">2</span>
+        <span class="step-label">Local</span>
+      </div>
+      <div class="step-line" id="line2"></div>
+      <div class="step-indicator" data-step="3">
+        <span class="step-num">3</span>
+        <span class="step-label">Fotos</span>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Conteúdo Principal do Aplicativo -->
+  <main class="app-main">
+
+    <!-- ==================== TELA 1: CATEGORIA ==================== -->
+    <section id="screen1" class="screen-view active">
+      <div class="screen-intro">
+        <h2>Selecione o Tipo de Prédio</h2>
+        <p>Escolha a categoria do órgão público para registrar a limpeza:</p>
+      </div>
+
+      <div class="categories-grid" id="categoriesContainer">
+        <!-- Renderizado dinamicamente via JS -->
+      </div>
+    </section>
+
+    <!-- ==================== TELA 2: LUGARES / PRÉDIO ==================== -->
+    <section id="screen2" class="screen-view">
+      <div class="sub-nav">
+        <button id="btnBackToScreen1" class="btn-back">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          Categorias
+        </button>
+        <span id="currentCategoryBadge" class="cat-pill">Categoria</span>
+      </div>
+
+      <div class="search-box">
+        <div class="search-input-wrap">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="inputSearchPredio" placeholder="Buscar por nome, rua ou bairro..." autocomplete="off">
+          <button id="btnClearSearch" class="btn-clear-search hidden">✕</button>
+        </div>
+      </div>
+
+      <div class="places-count-bar">
+        <span id="placesCountText">Carregando locais...</span>
+      </div>
+
+      <div class="places-list" id="placesContainer">
+        <!-- Lista de prédios renderizada dinamicamente -->
+      </div>
+
+      <!-- Botão para adicionar prédio que não conste na lista -->
+      <div class="custom-place-box">
+        <button id="btnCustomPlace" class="btn-outline-custom">
+          <span>➕</span> Prédio ou Local não listado acima
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== TELA 3: FOTOS E DATAS ==================== -->
+    <section id="screen3" class="screen-view">
+      <div class="sub-nav">
+        <button id="btnBackToScreen2" class="btn-back">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          Mudar Local
+        </button>
+      </div>
+
+      <!-- Card do Prédio Selecionado -->
+      <div class="selected-building-card">
+        <div class="building-icon-wrap" id="selectedBuildingIcon">🏛️</div>
+        <div class="building-details">
+          <span class="selected-cat-name" id="selectedBuildingCat">Categoria</span>
+          <h3 id="selectedBuildingName">Nome do Prédio Público</h3>
+          <p id="selectedBuildingAddress">Endereço do Prédio</p>
+        </div>
+      </div>
+
+      <form id="formRegistro" onsubmit="return false;">
+        <!-- Data da Execução -->
+        <div class="form-group">
+          <label for="inputDataExecucao" class="form-label">
+            <span>📅 Data da Execução / Vistoria:</span>
+          </label>
+          <input type="date" id="inputDataExecucao" class="form-control" required>
+        </div>
+
+        <!-- Responsável (Opcional) -->
+        <div class="form-group">
+          <label for="inputResponsavel" class="form-label">
+            <span>👤 Responsável pela Equipe (opcional):</span>
+          </label>
+          <input type="text" id="inputResponsavel" class="form-control" placeholder="Ex: Encarregado Silva / Equipe 02">
+        </div>
+
+        <!-- Observações (Opcional) -->
+        <div class="form-group">
+          <label for="inputObservacoes" class="form-label">
+            <span>📝 Observações do Serviço (opcional):</span>
+          </label>
+          <textarea id="inputObservacoes" class="form-control" rows="2" placeholder="Ex: Capina interna e externa concluída, roçagem e coleta de entulhos."></textarea>
+        </div>
+
+        <!-- Área de Anexo de Fotos -->
+        <div class="photos-section">
+          <div class="photos-header">
+            <div>
+              <h4 class="photos-title">📸 Anexar Fotos do Prédio</h4>
+              <p class="photos-subtitle">Você pode anexar até 20 fotos por envio</p>
+            </div>
+            <span class="photo-badge" id="photoCountBadge">0 / 20</span>
+          </div>
+
+          <!-- Botões de Ação de Foto (Câmera Direta e Galeria) -->
+          <div class="photo-action-buttons">
+            <button type="button" id="btnTriggerCamera" class="btn-photo-action btn-camera">
+              <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+              <span>Tirar Foto</span>
+            </button>
+
+            <button type="button" id="btnTriggerGallery" class="btn-photo-action btn-gallery">
+              <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+              <span>Galeria</span>
+            </button>
+          </div>
+
+          <!-- Inputs invisíveis para acionar câmera nativa ou seletor de arquivos -->
+          <input type="file" id="cameraInput" accept="image/*" capture="environment" class="file-input-hidden">
+          <input type="file" id="galleryInput" accept="image/*" multiple class="file-input-hidden">
+
+          <!-- Grade de Fotos Anexadas -->
+          <div class="photos-grid" id="photosGrid">
+            <!-- Vazio por padrão -->
+            <div class="photos-empty-state" id="photosEmptyState">
+              <span class="empty-icon">📷</span>
+              <p>Nenhuma foto anexada ainda</p>
+              <small>Toque em <b>Tirar Foto</b> ou <b>Galeria</b> para adicionar</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botão de Envio Principal -->
+        <div class="submit-wrap">
+          <button type="button" id="btnSubmitForm" class="btn-submit" disabled>
+            <span class="btn-submit-icon">🚀</span>
+            <span class="btn-submit-text">Enviar Fotos e Salvar no Drive</span>
+          </button>
+          <p class="submit-note">As fotos serão salvas na pasta <b>"fotos selim predios publicos"</b> e a planilha será atualizada com o link único.</p>
+        </div>
+      </form>
+    </section>
+
+    <!-- ==================== TELA 4: SUCESSO ==================== -->
+    <section id="screen4" class="screen-view">
+      <div class="success-card">
+        <div class="success-icon-anim">
+          <svg viewBox="0 0 52 52" class="checkmark">
+            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+          </svg>
+        </div>
+
+        <h2 class="success-title">Registro Enviado com Sucesso!</h2>
+        <p class="success-desc">As fotos foram organizadas no Google Drive e a planilha de controle foi atualizada automaticamente.</p>
+
+        <div class="success-details-box">
+          <div class="detail-row">
+            <span class="detail-label">Prédio:</span>
+            <span class="detail-value" id="successPredioNome">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Data da Execução:</span>
+            <span class="detail-value" id="successDataExecucao">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Fotos Enviadas:</span>
+            <span class="detail-value" id="successFotosCount">-</span>
+          </div>
+        </div>
+
+        <!-- Botão para Abrir a Pasta no Google Drive -->
+        <a id="btnOpenDriveFolder" href="#" target="_blank" rel="noopener noreferrer" class="btn-drive-folder">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+          </svg>
+          <span>📂 Abrir Pasta no Google Drive</span>
+        </a>
+
+        <button type="button" id="btnNewSubmission" class="btn-new-submission">
+          <span>🔄</span> Cadastrar Outro Prédio
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal de Configuração da URL do Google Apps Script -->
+  <div id="settingsModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Configuração do Google Apps Script</h3>
+        <button id="btnCloseSettings" class="btn-close-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-help-text">
+          Insira abaixo a <b>URL do Web App</b> gerada ao implantar o script do Google Apps Script:
+        </p>
+        <div class="form-group">
+          <label for="inputScriptUrl" class="form-label">URL da Implantação (Web App):</label>
+          <input type="url" id="inputScriptUrl" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
+        </div>
+        <div class="status-indicator-box">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Modo Demonstração / Teste Ativo</span>
+        </div>
+        <div class="modal-info-box">
+          <p>📌 <b>Como conseguir essa URL?</b></p>
+          <ol>
+            <li>Abra <code>script.google.com</code></li>
+            <li>Cole o código do arquivo <code>backend/codigo_google_apps_script.js</code></li>
+            <li>Clique em <b>Implantar</b> > <b>Nova implantação</b> > <b>App da Web</b></li>
+            <li>Acesso: <i>Qualquer pessoa</i></li>
+            <li>Copie a URL e cole aqui!</li>
+          </ol>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnSaveSettings" class="btn-primary-modal">Salvar Configuração</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Visualização em Tamanho Real da Foto -->
+  <div id="photoPreviewModal" class="modal-backdrop hidden">
+    <div class="photo-viewer-card">
+      <button id="btnClosePhotoViewer" class="btn-close-viewer">✕</button>
+      <img id="viewerImage" src="" alt="Foto ampliada">
+    </div>
+  </div>
+
+  <!-- Overlay de Upload com Barra de Progresso -->
+  <div id="uploadOverlay" class="upload-overlay hidden">
+    <div class="upload-card">
+      <div class="spinner-ring"></div>
+      <h3 id="uploadStatusTitle">Preparando fotos...</h3>
+      <p id="uploadStatusSubtitle">Redimensionando imagens para envio rápido</p>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="uploadProgressBar"></div>
+      </div>
+      <span class="progress-percent" id="uploadProgressPercent">0%</span>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data_predios.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
