@@ -8,7 +8,7 @@
 
 // URL padrão do Google Apps Script. Depois de publicar o backend, o endereço
 // real fica gravado aqui para que todos os celulares já abram conectados.
-const DEFAULT_GAS_URL = "";
+const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbxknOR0N0KFBkfhWYJ5YtH_zj_sNmlMXjmQF6Cy7xmbwmf5Cg3IYs5zFQnP3hIAqkWB/exec";
 
 document.addEventListener('DOMContentLoaded', () => {
   // Estado da Aplicação

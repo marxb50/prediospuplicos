@@ -8,6 +8,8 @@ Este tutorial ensina como ativar o script oficial do Google para que todas as fo
 
 1. No computador ou no celular, acesse: **[script.google.com](https://script.google.com/)**
 2. Faça login com a conta Google onde você deseja salvar as fotos e a planilha.
+
+> Implantação atual do projeto: `https://script.google.com/macros/s/AKfycbxknOR0N0KFBfkhWYJ5YtH_zj_sNmlMXjmQF6Cy7xmbwmf5Cg3IYs5zFQnP3hIAqkWB/exec`
 3. Clique no botão **"Novo projeto"** (ou **"New project"**).
 
 ---
