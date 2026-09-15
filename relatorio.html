@@ -1055,16 +1055,33 @@
         }).join("") + "</div>";
       }
 
-      function renderRecord(record, index, repeatInfo) {
+      function recordTime(record) {
+        var timestamp = String(record.timestamp || "").match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+        if (timestamp) {
+          return new Date(
+            Number(timestamp[3]),
+            Number(timestamp[2]) - 1,
+            Number(timestamp[1]),
+            Number(timestamp[4] || 0),
+            Number(timestamp[5] || 0),
+            Number(timestamp[6] || 0)
+          ).getTime();
+        }
+        var iso = String(record.dataIso || "");
+        return /^\d{4}-\d{2}-\d{2}$/.test(iso) ? new Date(iso + "T00:00:00").getTime() : 0;
+      }
+
+      function renderRecord(record, repeatInfo) {
         var note = record.observacoes ? '<div class="record-note"><strong>Observações:</strong> ' + escapeHtml(record.observacoes) + '</div>' : "";
         var folderLink = record.folderUrl ? '<a class="record-link" href="' + escapeHtml(record.folderUrl) + '" target="_blank" rel="noopener">📂 Abrir pasta com todas as fotos</a>' : "";
         var recordId = String(record.recordId || "");
         var deleteButton = getDeleteCredential(recordId) ? '<button class="delete-record-btn" type="button" data-record-id="' + escapeHtml(recordId) + '" data-record-name="' + escapeHtml(record.predioNome || "esta execução") + '">Deletar</button>' : "";
-        var repeatBadge = repeatInfo && repeatInfo.total > 1 ? '<span class="record-repeat">' + repeatInfo.position + ' de ' + repeatInfo.total + ' execuções neste prédio</span>' : "";
+        var executionPosition = repeatInfo ? repeatInfo.position : 1;
+        var repeatBadge = repeatInfo && repeatInfo.total > 1 ? '<span class="record-repeat">' + repeatInfo.total + ' execuções neste prédio</span>' : "";
         return '<article class="record-card">' +
           '<div class="record-head">' +
             '<div class="record-heading">' +
-              '<span class="record-number">EXECUÇÃO ' + pad(index + 1) + '</span>' +
+              '<span class="record-number">' + executionPosition + 'ª EXECUÇÃO</span>' +
               '<span class="record-category">' + escapeHtml(record.categoria || "Geral") + '</span>' +
               repeatBadge +
             '</div>' +
@@ -1169,16 +1186,23 @@
         if (!records.length) {
           recordsContainer.innerHTML = '<div class="empty-state">Nenhuma execução foi encontrada com esses filtros. Ajuste o período, a categoria, o prédio ou a busca detalhada.</div>';
         } else {
-          var totalsByBuilding = {};
-          var seenByBuilding = {};
+          var recordsByBuilding = {};
+          var executionInfo = new Map();
           records.forEach(function (record) {
             var key = normalizeText(record.predioNome || "Prédio não informado");
-            totalsByBuilding[key] = (totalsByBuilding[key] || 0) + 1;
+            if (!recordsByBuilding[key]) recordsByBuilding[key] = [];
+            recordsByBuilding[key].push(record);
           });
-          recordsContainer.innerHTML = records.map(function (record, index) {
-            var key = normalizeText(record.predioNome || "Prédio não informado");
-            seenByBuilding[key] = (seenByBuilding[key] || 0) + 1;
-            return renderRecord(record, index, {position: seenByBuilding[key], total: totalsByBuilding[key]});
+          Object.keys(recordsByBuilding).forEach(function (key) {
+            var buildingRecords = recordsByBuilding[key].slice().sort(function (a, b) {
+              return recordTime(a) - recordTime(b);
+            });
+            buildingRecords.forEach(function (record, index) {
+              executionInfo.set(record, {position: index + 1, total: buildingRecords.length});
+            });
+          });
+          recordsContainer.innerHTML = records.map(function (record) {
+            return renderRecord(record, executionInfo.get(record));
           }).join("");
         }
 
