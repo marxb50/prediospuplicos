@@ -257,7 +257,7 @@
 
     .filter-fields {
       display: grid;
-      grid-template-columns: 1fr 1fr 1.3fr auto;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 8px;
       align-items: end;
     }
@@ -305,6 +305,31 @@
 
     .generate-btn:hover {
       background: var(--blue);
+    }
+
+    .filter-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 7px;
+      grid-column: 1 / -1;
+    }
+
+    .clear-filters-btn {
+      min-height: 32px;
+      border: 1px solid #c9d6e2;
+      border-radius: 5px;
+      background: #fff;
+      color: var(--navy);
+      padding: 7px 12px;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .clear-filters-btn:hover {
+      border-color: var(--blue);
+      color: var(--blue);
     }
 
     .summary-grid {
@@ -423,6 +448,17 @@
       font-weight: 800;
       letter-spacing: 0.35px;
       text-transform: uppercase;
+    }
+
+    .record-repeat {
+      padding: 4px 7px;
+      border: 1px solid #d7c4f3;
+      border-radius: 4px;
+      background: #f6f0ff;
+      color: #65439b;
+      font-size: 9px;
+      font-weight: 800;
+      white-space: nowrap;
     }
 
     .record-status {
@@ -682,7 +718,8 @@
       }
 
       .filter-fields .field:nth-child(3),
-      .filter-fields .generate-btn {
+      .filter-fields .field:nth-child(6),
+      .filter-fields .filter-actions {
         grid-column: span 2;
       }
 
@@ -799,7 +836,26 @@
             <option>Outros Prédios Públicos</option>
           </select>
         </div>
-        <button id="btnGenerate" class="generate-btn" type="button">Gerar relatório</button>
+        <div class="field">
+          <label for="inputPredio">Prédio / local</label>
+          <select id="inputPredio">
+            <option value="">Todos os prédios</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="inputResponsavelFiltro">Responsável</label>
+          <select id="inputResponsavelFiltro">
+            <option value="">Todos os responsáveis</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="inputBusca">Busca detalhada</label>
+          <input id="inputBusca" type="search" placeholder="Nome, bairro, endereço ou observação">
+        </div>
+        <div class="filter-actions">
+          <button id="btnClearFilters" class="clear-filters-btn" type="button">Limpar filtros</button>
+          <button id="btnGenerate" class="generate-btn" type="button">Gerar relatório</button>
+        </div>
       </div>
     </section>
 
@@ -844,11 +900,16 @@
       var inputInicio = document.getElementById("inputInicio");
       var inputFim = document.getElementById("inputFim");
       var inputCategoria = document.getElementById("inputCategoria");
+      var inputPredio = document.getElementById("inputPredio");
+      var inputResponsavelFiltro = document.getElementById("inputResponsavelFiltro");
+      var inputBusca = document.getElementById("inputBusca");
       var btnGenerate = document.getElementById("btnGenerate");
+      var btnClearFilters = document.getElementById("btnClearFilters");
       var reportState = document.getElementById("reportState");
       var reportContent = document.getElementById("reportContent");
       var recordsContainer = document.getElementById("recordsContainer");
       var periodText = document.getElementById("periodText");
+      var lastReportData = null;
 
       function pad(value) {
         return String(value).padStart(2, "0");
@@ -902,6 +963,61 @@
         return "Período consultado: " + formatDate(start) + " a " + formatDate(end);
       }
 
+      function normalizeText(value) {
+        return String(value || "")
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+          .trim();
+      }
+
+      function populateFilter(select, values, emptyLabel) {
+        var currentValue = select.value;
+        var uniqueValues = Array.from(new Set(values.filter(Boolean))).sort(function (a, b) {
+          return String(a).localeCompare(String(b), "pt-BR", {numeric: true});
+        });
+        select.innerHTML = '<option value="">' + escapeHtml(emptyLabel) + '</option>' + uniqueValues.map(function (value) {
+          return '<option value="' + escapeHtml(value) + '">' + escapeHtml(value) + '</option>';
+        }).join("");
+        if (uniqueValues.indexOf(currentValue) > -1) select.value = currentValue;
+      }
+
+      function populateFineFilters(records) {
+        populateFilter(inputPredio, records.map(function (record) { return record.predioNome || ""; }), "Todos os prédios");
+        populateFilter(inputResponsavelFiltro, records.map(function (record) { return record.responsavel || ""; }), "Todos os responsáveis");
+      }
+
+      function filterRecords(records) {
+        var selectedBuilding = normalizeText(inputPredio.value);
+        var selectedResponsible = normalizeText(inputResponsavelFiltro.value);
+        var search = normalizeText(inputBusca.value);
+
+        return records.filter(function (record) {
+          if (selectedBuilding && normalizeText(record.predioNome) !== selectedBuilding) return false;
+          if (selectedResponsible && normalizeText(record.responsavel) !== selectedResponsible) return false;
+          if (!search) return true;
+
+          var searchable = [
+            record.predioNome,
+            record.endereco,
+            record.observacoes,
+            record.categoria,
+            record.responsavel,
+            record.dataExecucao
+          ].map(normalizeText).join(" ");
+          return searchable.indexOf(search) > -1;
+        });
+      }
+
+      function activeFilterText() {
+        var filters = [];
+        if (inputCategoria.value) filters.push(inputCategoria.value);
+        if (inputPredio.value) filters.push(inputPredio.value);
+        if (inputResponsavelFiltro.value) filters.push("Responsável: " + inputResponsavelFiltro.value);
+        if (inputBusca.value.trim()) filters.push('Busca: "' + inputBusca.value.trim() + '"');
+        return filters.length ? " • " + filters.join(" • ") : "";
+      }
+
       function getDeleteCredential(recordId) {
         if (!recordId) return "";
         try {
@@ -939,16 +1055,18 @@
         }).join("") + "</div>";
       }
 
-      function renderRecord(record, index) {
+      function renderRecord(record, index, repeatInfo) {
         var note = record.observacoes ? '<div class="record-note"><strong>Observações:</strong> ' + escapeHtml(record.observacoes) + '</div>' : "";
         var folderLink = record.folderUrl ? '<a class="record-link" href="' + escapeHtml(record.folderUrl) + '" target="_blank" rel="noopener">📂 Abrir pasta com todas as fotos</a>' : "";
         var recordId = String(record.recordId || "");
         var deleteButton = getDeleteCredential(recordId) ? '<button class="delete-record-btn" type="button" data-record-id="' + escapeHtml(recordId) + '" data-record-name="' + escapeHtml(record.predioNome || "esta execução") + '">Deletar</button>' : "";
+        var repeatBadge = repeatInfo && repeatInfo.total > 1 ? '<span class="record-repeat">' + repeatInfo.position + ' de ' + repeatInfo.total + ' execuções neste prédio</span>' : "";
         return '<article class="record-card">' +
           '<div class="record-head">' +
             '<div class="record-heading">' +
               '<span class="record-number">EXECUÇÃO ' + pad(index + 1) + '</span>' +
               '<span class="record-category">' + escapeHtml(record.categoria || "Geral") + '</span>' +
+              repeatBadge +
             '</div>' +
             '<div class="record-actions"><span class="record-status">● Registrada</span>' + deleteButton + '</div>' +
           '</div>' +
@@ -1031,21 +1149,37 @@
           return;
         }
 
-        var records = Array.isArray(data.registros) ? data.registros : [];
+        var allRecords = Array.isArray(data.registros) ? data.registros : [];
+        populateFineFilters(allRecords);
+        var records = filterRecords(allRecords);
         var buildings = new Set(records.map(function (record) { return record.predioNome; }));
         var categories = new Set(records.map(function (record) { return record.categoria; }));
+        var totalPhotos = records.reduce(function (total, record) {
+          var photos = Array.isArray(record.fotos) ? record.fotos.length : 0;
+          return total + (photos || Number(record.fotosRecebidas) || 0);
+        }, 0);
 
-        document.getElementById("summaryExecutions").textContent = data.totalExecucoes || records.length;
+        document.getElementById("summaryExecutions").textContent = records.length;
         document.getElementById("summaryBuildings").textContent = buildings.size;
-        document.getElementById("summaryPhotos").textContent = data.totalFotos || 0;
+        document.getElementById("summaryPhotos").textContent = totalPhotos;
         document.getElementById("summaryCategories").textContent = categories.size;
-        periodText.textContent = formatPeriod(start, end) + (inputCategoria.value ? " • " + inputCategoria.value : "");
+        periodText.textContent = formatPeriod(start, end) + activeFilterText();
         document.getElementById("generatedText").textContent = "Gerado em " + new Date().toLocaleString("pt-BR");
 
         if (!records.length) {
-          recordsContainer.innerHTML = '<div class="empty-state">Nenhuma execução foi encontrada para esse período. Escolha outro intervalo ou categoria.</div>';
+          recordsContainer.innerHTML = '<div class="empty-state">Nenhuma execução foi encontrada com esses filtros. Ajuste o período, a categoria, o prédio ou a busca detalhada.</div>';
         } else {
-          recordsContainer.innerHTML = records.map(renderRecord).join("");
+          var totalsByBuilding = {};
+          var seenByBuilding = {};
+          records.forEach(function (record) {
+            var key = normalizeText(record.predioNome || "Prédio não informado");
+            totalsByBuilding[key] = (totalsByBuilding[key] || 0) + 1;
+          });
+          recordsContainer.innerHTML = records.map(function (record, index) {
+            var key = normalizeText(record.predioNome || "Prédio não informado");
+            seenByBuilding[key] = (seenByBuilding[key] || 0) + 1;
+            return renderRecord(record, index, {position: seenByBuilding[key], total: totalsByBuilding[key]});
+          }).join("");
         }
 
         reportState.classList.add("hidden");
@@ -1122,6 +1256,7 @@
 
         consultarCandidatos(0)
           .then(function (data) {
+            lastReportData = data;
             renderReport(data, start, end);
             document.title = "Relatório " + formatDate(start) + " a " + formatDate(end) + " • SELIM";
           })
@@ -1145,6 +1280,22 @@
         document.querySelectorAll(".preset").forEach(function (item) { item.classList.remove("active"); });
       });
       btnGenerate.addEventListener("click", loadReport);
+      inputPredio.addEventListener("change", function () {
+        if (lastReportData) renderReport(lastReportData, inputInicio.value, inputFim.value);
+      });
+      inputResponsavelFiltro.addEventListener("change", function () {
+        if (lastReportData) renderReport(lastReportData, inputInicio.value, inputFim.value);
+      });
+      inputBusca.addEventListener("input", function () {
+        if (lastReportData) renderReport(lastReportData, inputInicio.value, inputFim.value);
+      });
+      btnClearFilters.addEventListener("click", function () {
+        inputCategoria.value = "";
+        inputPredio.value = "";
+        inputResponsavelFiltro.value = "";
+        inputBusca.value = "";
+        loadReport();
+      });
       recordsContainer.addEventListener("click", function (event) {
         var button = event.target.closest(".delete-record-btn");
         if (button) deleteRecord(button);
