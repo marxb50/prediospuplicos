@@ -436,6 +436,38 @@
       white-space: nowrap;
     }
 
+    .record-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .delete-record-btn {
+      padding: 4px 8px;
+      border: 1px solid #d92d20;
+      border-radius: 4px;
+      background: #d92d20;
+      color: #fff;
+      font: inherit;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .delete-record-btn:hover,
+    .delete-record-btn:focus-visible {
+      border-color: #a71812;
+      background: #a71812;
+    }
+
+    .delete-record-btn:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+
     .record-body {
       padding: 10px;
     }
@@ -673,7 +705,8 @@
       }
 
       .screen-toolbar,
-      .filters {
+      .filters,
+      .delete-record-btn {
         display: none !important;
       }
 
@@ -805,6 +838,7 @@
   <script>
     (function () {
       var DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbxknOR0N0KFBkfhWYJ5YtH_zj_sNmlMXjmQF6Cy7xmbwmf5Cg3IYs5zFQnP3hIAqkWB/exec";
+      var DELETE_KEYS_STORAGE_KEY = "selim_delete_keys";
       var query = new URLSearchParams(window.location.search);
       var gasUrl = query.get("gas") || localStorage.getItem("selim_gas_url") || DEFAULT_GAS_URL;
       var inputInicio = document.getElementById("inputInicio");
@@ -868,6 +902,26 @@
         return "Período consultado: " + formatDate(start) + " a " + formatDate(end);
       }
 
+      function getDeleteCredential(recordId) {
+        if (!recordId) return "";
+        try {
+          var saved = JSON.parse(localStorage.getItem(DELETE_KEYS_STORAGE_KEY) || "{}");
+          return String(saved[recordId] || "");
+        } catch (error) {
+          return "";
+        }
+      }
+
+      function removeDeleteCredential(recordId) {
+        try {
+          var saved = JSON.parse(localStorage.getItem(DELETE_KEYS_STORAGE_KEY) || "{}");
+          delete saved[recordId];
+          localStorage.setItem(DELETE_KEYS_STORAGE_KEY, JSON.stringify(saved));
+        } catch (error) {
+          console.warn("Não foi possível remover a chave local de exclusão.", error);
+        }
+      }
+
       function renderPhotos(record) {
         var photos = Array.isArray(record.fotos) ? record.fotos : [];
         if (!photos.length) {
@@ -888,13 +942,15 @@
       function renderRecord(record, index) {
         var note = record.observacoes ? '<div class="record-note"><strong>Observações:</strong> ' + escapeHtml(record.observacoes) + '</div>' : "";
         var folderLink = record.folderUrl ? '<a class="record-link" href="' + escapeHtml(record.folderUrl) + '" target="_blank" rel="noopener">📂 Abrir pasta com todas as fotos</a>' : "";
+        var recordId = String(record.recordId || "");
+        var deleteButton = getDeleteCredential(recordId) ? '<button class="delete-record-btn" type="button" data-record-id="' + escapeHtml(recordId) + '" data-record-name="' + escapeHtml(record.predioNome || "esta execução") + '">Deletar</button>' : "";
         return '<article class="record-card">' +
           '<div class="record-head">' +
             '<div class="record-heading">' +
               '<span class="record-number">EXECUÇÃO ' + pad(index + 1) + '</span>' +
               '<span class="record-category">' + escapeHtml(record.categoria || "Geral") + '</span>' +
             '</div>' +
-            '<span class="record-status">● Registrada</span>' +
+            '<div class="record-actions"><span class="record-status">● Registrada</span>' + deleteButton + '</div>' +
           '</div>' +
           '<div class="record-body">' +
             '<div class="record-meta">' +
@@ -909,6 +965,55 @@
             renderPhotos(record) +
           '</div>' +
         '</article>';
+      }
+
+      function deleteRecord(button) {
+        var recordId = button.getAttribute("data-record-id") || "";
+        var recordName = button.getAttribute("data-record-name") || "esta execução";
+        var deleteToken = getDeleteCredential(recordId);
+
+        if (!recordId || !deleteToken) {
+          alert("A chave de exclusão deste registro não está disponível neste navegador.");
+          return;
+        }
+
+        if (!window.confirm('Excluir o registro de "' + recordName + '"? A linha da planilha e a pasta com as fotos serão movidas para a lixeira.')) return;
+
+        button.disabled = true;
+        button.textContent = "Excluindo...";
+
+        fetch(gasUrl, {
+          method: "POST",
+          headers: {"Content-Type": "text/plain;charset=utf-8"},
+          body: JSON.stringify({
+            acao: "excluirRegistro",
+            recordId: recordId,
+            deleteToken: deleteToken
+          })
+        })
+          .then(function (response) {
+            if (!response.ok) throw new Error("Resposta HTTP " + response.status);
+            return response.text();
+          })
+          .then(function (text) {
+            var data;
+            try {
+              data = JSON.parse(text);
+            } catch (error) {
+              throw new Error("O Google retornou uma resposta inválida.");
+            }
+            if (!data || data.status !== "success") {
+              throw new Error((data && data.message) || "Não foi possível excluir o registro.");
+            }
+            removeDeleteCredential(recordId);
+            alert("Registro e pasta de fotos excluídos com sucesso.");
+            loadReport();
+          })
+          .catch(function (error) {
+            button.disabled = false;
+            button.textContent = "Deletar";
+            alert("Não foi possível excluir o registro: " + error.message);
+          });
       }
 
       function showError(message, allowRetry) {
@@ -1040,6 +1145,10 @@
         document.querySelectorAll(".preset").forEach(function (item) { item.classList.remove("active"); });
       });
       btnGenerate.addEventListener("click", loadReport);
+      recordsContainer.addEventListener("click", function (event) {
+        var button = event.target.closest(".delete-record-btn");
+        if (button) deleteRecord(button);
+      });
       document.getElementById("btnPrint").addEventListener("click", function () { window.print(); });
 
       if (query.get("inicio") && query.get("fim")) {

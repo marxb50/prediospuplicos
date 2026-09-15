@@ -23,7 +23,9 @@ const CABECALHOS_REGISTROS = [
   "Link da Pasta no Google Drive (Todas as Fotos)",
   "Responsável",
   "Observações",
-  "Links Individuais das Fotos"
+  "Links Individuais das Fotos",
+  "ID do Registro",
+  "Chave de Exclusão"
 ];
 
 /** Responde ao healthcheck ou ao pedido de dados do relatório. */
@@ -51,6 +53,11 @@ function doPost(e) {
     }
 
     const payload = JSON.parse(e.postData.contents);
+
+    if (payload.acao === "excluirRegistro" || payload.action === "deleteRecord") {
+      return responderJson(excluirRegistro(payload));
+    }
+
     const categoria = payload.categoria || "Geral";
     const predioNome = payload.predioNome || "Prédio Não Identificado";
     const endereco = payload.endereco || "Endereço não informado";
@@ -94,6 +101,8 @@ function doPost(e) {
     const planilha = obterOuCriarPlanilha(pastaRaiz, NOME_PLANILHA);
     const aba = garantirAbaRegistros(planilha);
     const timestamp = Utilities.formatDate(new Date(), FUSO_HORARIO, "dd/MM/yyyy HH:mm:ss");
+    const recordId = Utilities.getUuid();
+    const deleteToken = gerarChaveExclusao();
 
     aba.appendRow([
       timestamp,
@@ -105,7 +114,9 @@ function doPost(e) {
       linkPastaDrive,
       responsavel,
       observacoes,
-      linksFotos.join("\n")
+      linksFotos.join("\n"),
+      recordId,
+      deleteToken
     ]);
 
     return responderJson({
@@ -119,7 +130,9 @@ function doPost(e) {
       folderName: nomeSubpasta,
       photoUrls: linksFotos,
       sheetUrl: planilha.getUrl(),
-      timestamp: timestamp
+      timestamp: timestamp,
+      recordId: recordId,
+      deleteToken: deleteToken
     });
 
   } catch (error) {
@@ -129,6 +142,65 @@ function doPost(e) {
       message: error.message || error.toString()
     });
   }
+}
+
+/** Exclui uma execução somente quando a chave privada do navegador confere. */
+function excluirRegistro(payload) {
+  const recordId = String(payload.recordId || "").trim();
+  const deleteToken = String(payload.deleteToken || "").trim();
+  if (!recordId || !deleteToken) {
+    throw new Error("Identificação ou chave de exclusão ausente.");
+  }
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+
+  try {
+    const pastaRaiz = obterOuCriarPastaRaiz(NOME_PASTA_PRINCIPAL);
+    const arquivoPlanilha = pastaRaiz.getFilesByName(NOME_PLANILHA);
+    if (!arquivoPlanilha.hasNext()) throw new Error("Planilha de registros não encontrada.");
+
+    const planilha = SpreadsheetApp.openById(arquivoPlanilha.next().getId());
+    const aba = garantirAbaRegistros(planilha);
+    const valores = aba.getDataRange().getDisplayValues();
+    let indiceLinha = -1;
+
+    for (let i = 1; i < valores.length; i++) {
+      if (String(valores[i][10] || "") === recordId) {
+        indiceLinha = i;
+        break;
+      }
+    }
+
+    if (indiceLinha < 0 || String(valores[indiceLinha][11] || "") !== deleteToken) {
+      throw new Error("Registro não encontrado ou exclusão não autorizada.");
+    }
+
+    const pastaUrl = valores[indiceLinha][6] || "";
+    const pastaId = extrairIdPasta(pastaUrl);
+    if (pastaId) {
+      try {
+        DriveApp.getFolderById(pastaId).setTrashed(true);
+      } catch (errorPasta) {
+        Logger.log("A linha será excluída, mas a pasta não pôde ser movida para a lixeira: " + errorPasta.toString());
+      }
+    }
+
+    aba.deleteRow(indiceLinha + 1);
+    SpreadsheetApp.flush();
+
+    return {
+      status: "success",
+      message: "Registro e pasta de fotos excluídos com sucesso.",
+      recordId: recordId
+    };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function gerarChaveExclusao() {
+  return Utilities.getUuid().replace(/-/g, "") + Utilities.getUuid().replace(/-/g, "");
 }
 
 /** Monta todos os registros do período solicitado para a tela de relatório. */
@@ -189,6 +261,7 @@ function obterRelatorio(parametros) {
         folderUrl: pastaUrl,
         responsavel: linha[7] || "Não informado",
         observacoes: linha[8] || "",
+        recordId: linha[10] || "",
         fotos: fotosCompletas
       });
     }
@@ -346,4 +419,7 @@ function configurarCabecalho(aba) {
   aba.setColumnWidth(8, 160);
   aba.setColumnWidth(9, 300);
   aba.setColumnWidth(10, 420);
+  aba.setColumnWidth(11, 230);
+  aba.setColumnWidth(12, 230);
+  aba.hideColumns(12);
 }

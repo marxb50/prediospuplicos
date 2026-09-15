@@ -9,6 +9,7 @@
 // URL padrão do Google Apps Script. Depois de publicar o backend, o endereço
 // real fica gravado aqui para que todos os celulares já abram conectados.
 const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbxknOR0N0KFBkfhWYJ5YtH_zj_sNmlMXjmQF6Cy7xmbwmf5Cg3IYs5zFQnP3hIAqkWB/exec";
+const DELETE_KEYS_STORAGE_KEY = 'selim_delete_keys';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Estado da Aplicação
@@ -541,6 +542,8 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error(result.message || 'Erro desconhecido retornado pelo servidor Google.');
       }
 
+      saveDeleteCredential(result.recordId, result.deleteToken);
+
       updateUploadPercent(100);
       setTimeout(() => {
         finishSuccess({
@@ -601,6 +604,18 @@ document.addEventListener('DOMContentLoaded', () => {
       return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
     return isoDate;
+  }
+
+  function saveDeleteCredential(recordId, deleteToken) {
+    if (!recordId || !deleteToken) return;
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(DELETE_KEYS_STORAGE_KEY) || '{}');
+      saved[recordId] = deleteToken;
+      localStorage.setItem(DELETE_KEYS_STORAGE_KEY, JSON.stringify(saved));
+    } catch (error) {
+      console.warn('Não foi possível guardar a chave de exclusão deste registro.', error);
+    }
   }
 
   function showUploadProgress(title, subtitle, percent) {
