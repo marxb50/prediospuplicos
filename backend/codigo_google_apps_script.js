@@ -125,27 +125,35 @@ function doPost(e) {
       return responderJson(excluirRegistro(payload));
     }
 
+    if (payload.acao === "adicionarFotos" || payload.action === "appendPhotos") {
+      return responderJson(adicionarFotosARegistro(payload));
+    }
+
     const categoria = payload.categoria || "Geral";
     const predioNome = payload.predioNome || "Prédio Não Identificado";
     const endereco = payload.endereco || "Endereço não informado";
     const dataExecucao = payload.dataExecucao || Utilities.formatDate(new Date(), FUSO_HORARIO, "dd/MM/yyyy");
     const responsavel = payload.responsavel || "Não informado";
     const observacoes = payload.observacoes || "";
-    const fotos = payload.fotos || [];
+    const fotos = Array.isArray(payload.fotos) ? payload.fotos.slice(0, 20) : [];
 
     const pastaRaiz = obterOuCriarPastaRaiz(NOME_PASTA_PRINCIPAL);
     const dataFormatadaPasta = dataExecucao.replace(/\//g, "-").replace(/\./g, "-");
     const nomeSubpasta = `[${dataFormatadaPasta}] ${predioNome}`;
-    const subpasta = pastaRaiz.createFolder(nomeSubpasta);
-
-    compartilharComoLeitura(subpasta);
-    const linkPastaDrive = subpasta.getUrl();
+    const fotosValidas = fotos.filter(function(itemFoto) {
+      return itemFoto && itemFoto.base64;
+    });
+    const subpasta = fotosValidas.length ? pastaRaiz.createFolder(nomeSubpasta) : null;
+    let linkPastaDrive = "";
+    if (subpasta) {
+      compartilharComoLeitura(subpasta);
+      linkPastaDrive = subpasta.getUrl();
+    }
     const linksFotos = [];
     let fotosSalvas = 0;
 
-    for (let i = 0; i < fotos.length; i++) {
-      const itemFoto = fotos[i];
-      if (!itemFoto || !itemFoto.base64) continue;
+    for (let i = 0; i < fotosValidas.length; i++) {
+      const itemFoto = fotosValidas[i];
 
       let base64Limpo = itemFoto.base64;
       if (base64Limpo.indexOf(",") > -1) {
@@ -188,7 +196,7 @@ function doPost(e) {
 
     return responderJson({
       status: "success",
-      message: "Fotos enviadas e registradas com sucesso!",
+      message: fotosSalvas ? "Fotos enviadas e registradas com sucesso!" : "Execução registrada sem fotos.",
       categoria: categoria,
       predioNome: predioNome,
       dataExecucao: dataExecucao,
@@ -208,6 +216,127 @@ function doPost(e) {
       status: "error",
       message: error.message || error.toString()
     });
+  }
+}
+
+/** Acrescenta fotos a uma execução existente ou materializa uma execução do histórico do Excel. */
+function adicionarFotosARegistro(payload) {
+  const fotos = (Array.isArray(payload.fotos) ? payload.fotos : []).filter(function(itemFoto) {
+    return itemFoto && itemFoto.base64;
+  });
+  if (!fotos.length) throw new Error("Selecione pelo menos uma foto para anexar.");
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+
+  try {
+    const pastaRaiz = obterOuCriarPastaRaiz(NOME_PASTA_PRINCIPAL);
+    const planilha = obterOuCriarPlanilha(pastaRaiz, NOME_PLANILHA);
+    const aba = garantirAbaRegistros(planilha);
+    const valores = aba.getDataRange().getDisplayValues();
+    const recordIdRecebido = String(payload.recordId || "").trim();
+    const predioNome = String(payload.predioNome || "Prédio Não Identificado").trim();
+    const dataExecucao = String(payload.dataExecucao || Utilities.formatDate(new Date(), FUSO_HORARIO, "dd/MM/yyyy")).trim();
+    const chavePredio = normalizarChave(predioNome);
+    const chaveData = normalizarDataChave(dataExecucao);
+    let numeroLinha = 0;
+
+    for (let i = 1; i < valores.length; i++) {
+      const idAtual = String(valores[i][10] || "").trim();
+      const correspondeId = recordIdRecebido && idAtual === recordIdRecebido;
+      const correspondeHistorico = normalizarChave(valores[i][3]) === chavePredio && normalizarDataChave(valores[i][1]) === chaveData;
+      if (correspondeId || (!recordIdRecebido && correspondeHistorico)) {
+        numeroLinha = i + 1;
+        break;
+      }
+    }
+
+    if (!numeroLinha) {
+      aba.appendRow([
+        Utilities.formatDate(new Date(), FUSO_HORARIO, "dd/MM/yyyy HH:mm:ss"),
+        dataExecucao,
+        payload.categoria || "Geral",
+        predioNome,
+        payload.endereco || "Endereço não informado",
+        0,
+        "",
+        payload.responsavel || "Não informado",
+        payload.observacoes || "",
+        "",
+        recordIdRecebido || Utilities.getUuid(),
+        gerarChaveExclusao()
+      ]);
+      numeroLinha = aba.getLastRow();
+    }
+
+    const rangeLinha = aba.getRange(numeroLinha, 1, 1, CABECALHOS_REGISTROS.length);
+    const linha = rangeLinha.getDisplayValues()[0];
+    let recordId = String(linha[10] || recordIdRecebido || "").trim();
+    let deleteToken = String(linha[11] || "").trim();
+    if (!recordId) recordId = Utilities.getUuid();
+    if (!deleteToken) deleteToken = gerarChaveExclusao();
+
+    let pastaUrl = String(linha[6] || "").trim();
+    let subpasta = null;
+    const pastaId = extrairIdPasta(pastaUrl);
+    if (pastaId) {
+      try {
+        subpasta = DriveApp.getFolderById(pastaId);
+      } catch (errorPasta) {
+        Logger.log("A pasta anterior não pôde ser aberta; uma nova será criada: " + errorPasta.toString());
+      }
+    }
+    if (!subpasta) {
+      const dataFormatadaPasta = dataExecucao.replace(/\//g, "-").replace(/\./g, "-");
+      subpasta = pastaRaiz.createFolder(`[${dataFormatadaPasta}] ${predioNome}`);
+      compartilharComoLeitura(subpasta);
+      pastaUrl = subpasta.getUrl();
+    }
+
+    const fotosExistentes = obterFotosDaPasta(pastaUrl);
+    const quantidadeExistente = Math.max(Number(linha[5]) || 0, fotosExistentes.length);
+    const vagas = Math.max(0, 20 - quantidadeExistente);
+    if (!vagas) throw new Error("Esta execução já atingiu o limite de 20 fotos.");
+
+    const linksExistentes = String(linha[9] || "").split(/\s*\n\s*/).filter(Boolean);
+    const linksNovos = [];
+    const fotosParaSalvar = fotos.slice(0, vagas);
+
+    for (let i = 0; i < fotosParaSalvar.length; i++) {
+      const itemFoto = fotosParaSalvar[i];
+      let base64Limpo = itemFoto.base64;
+      if (base64Limpo.indexOf(",") > -1) base64Limpo = base64Limpo.split(",")[1];
+
+      const mimeType = itemFoto.mimeType || "image/jpeg";
+      const extensao = mimeType.indexOf("png") > -1 ? "png" : "jpg";
+      const indice = quantidadeExistente + i + 1;
+      const nomeArquivo = itemFoto.name || `foto_${String(indice).padStart(2, "0")}.${extensao}`;
+      const arquivo = subpasta.createFile(Utilities.newBlob(Utilities.base64Decode(base64Limpo), mimeType, nomeArquivo));
+      compartilharComoLeitura(arquivo);
+      linksNovos.push(arquivo.getUrl());
+    }
+
+    linha[5] = quantidadeExistente + linksNovos.length;
+    linha[6] = pastaUrl;
+    linha[9] = linksExistentes.concat(linksNovos).join("\n");
+    linha[10] = recordId;
+    linha[11] = deleteToken;
+    rangeLinha.setValues([linha]);
+    SpreadsheetApp.flush();
+
+    return {
+      status: "success",
+      message: linksNovos.length + (linksNovos.length === 1 ? " foto anexada com sucesso." : " fotos anexadas com sucesso."),
+      recordId: recordId,
+      deleteToken: deleteToken,
+      fotosAdicionadas: linksNovos.length,
+      fotosRecebidas: Number(linha[5]) || linksNovos.length,
+      folderUrl: pastaUrl,
+      photoUrls: linksNovos,
+      sheetUrl: planilha.getUrl()
+    };
+  } finally {
+    lock.releaseLock();
   }
 }
 
@@ -414,6 +543,20 @@ function converterData(valor) {
   return isNaN(data.getTime()) ? null : data;
 }
 
+function normalizarChave(valor) {
+  return String(valor || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function normalizarDataChave(valor) {
+  const data = converterData(valor);
+  return data ? Utilities.formatDate(data, FUSO_HORARIO, "yyyy-MM-dd") : String(valor || "").trim();
+}
+
 function responderJson(objeto) {
   return ContentService.createTextOutput(JSON.stringify(objeto))
     .setMimeType(ContentService.MimeType.JSON);
@@ -464,7 +607,30 @@ function garantirAbaRegistros(planilha) {
     }
   }
   if (precisaAtualizar) configurarCabecalho(aba);
+  garantirIdentificadoresRegistros(aba);
   return aba;
+}
+
+function garantirIdentificadoresRegistros(aba) {
+  const ultimaLinha = aba.getLastRow();
+  if (ultimaLinha < 2) return;
+
+  const range = aba.getRange(2, 11, ultimaLinha - 1, 2);
+  const valores = range.getValues();
+  let alterou = false;
+
+  for (let i = 0; i < valores.length; i++) {
+    if (!String(valores[i][0] || "").trim()) {
+      valores[i][0] = Utilities.getUuid();
+      alterou = true;
+    }
+    if (!String(valores[i][1] || "").trim()) {
+      valores[i][1] = gerarChaveExclusao();
+      alterou = true;
+    }
+  }
+
+  if (alterou) range.setValues(valores);
 }
 
 function configurarCabecalho(aba) {

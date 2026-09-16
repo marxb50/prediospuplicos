@@ -472,6 +472,12 @@
       white-space: nowrap;
     }
 
+    .record-status.history {
+      border-color: #cbd5e1;
+      background: #f8fafc;
+      color: #526579;
+    }
+
     .record-actions {
       display: flex;
       align-items: center;
@@ -500,6 +506,30 @@
     }
 
     .delete-record-btn:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+
+    .add-photos-btn {
+      padding: 4px 8px;
+      border: 1px solid #d6a900;
+      border-radius: 4px;
+      background: var(--gold);
+      color: var(--navy);
+      font: inherit;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .add-photos-btn:hover,
+    .add-photos-btn:focus-visible {
+      border-color: #b28c00;
+      background: #f2bb00;
+    }
+
+    .add-photos-btn:disabled {
       cursor: wait;
       opacity: 0.65;
     }
@@ -730,7 +760,8 @@
 
       .screen-toolbar,
       .filters,
-      .delete-record-btn {
+      .delete-record-btn,
+      .add-photos-btn {
         display: none !important;
       }
 
@@ -897,6 +928,16 @@
       var recordsContainer = document.getElementById("recordsContainer");
       var periodText = document.getElementById("periodText");
       var lastReportData = null;
+      var recordActionMap = new Map();
+      var recordActionCounter = 0;
+      var pendingPhotoRecord = null;
+      var pendingPhotoButton = null;
+      var addPhotosInput = document.createElement("input");
+      addPhotosInput.type = "file";
+      addPhotosInput.accept = "image/*";
+      addPhotosInput.multiple = true;
+      addPhotosInput.className = "hidden";
+      document.body.appendChild(addPhotosInput);
 
       function pad(value) {
         return String(value).padStart(2, "0");
@@ -955,7 +996,58 @@
           .normalize("NFD")
           .replace(/[\u0300-\u036f]/g, "")
           .toLowerCase()
+          .replace(/[^a-z0-9]+/g, " ")
           .trim();
+      }
+
+      function isoFromRecord(record) {
+        var iso = String(record.dataIso || "");
+        if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso;
+        var match = String(record.dataExecucao || "").match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/);
+        return match ? match[3] + "-" + pad(match[2]) + "-" + pad(match[1]) : "";
+      }
+
+      function recordMergeKey(record) {
+        return normalizeText(record.predioNome) + "|" + isoFromRecord(record);
+      }
+
+      function historyToRecords(historyData) {
+        var buildings = historyData && Array.isArray(historyData.buildings) ? historyData.buildings : [];
+        var records = [];
+        buildings.forEach(function (building) {
+          (Array.isArray(building.executions) ? building.executions : []).forEach(function (executionDate) {
+            records.push({
+              timestamp: "",
+              dataExecucao: formatDate(executionDate),
+              dataIso: executionDate,
+              categoria: building.category || "Geral",
+              predioNome: building.name || "Prédio não informado",
+              endereco: building.address || "Endereço não informado",
+              fotosRecebidas: 0,
+              folderUrl: "",
+              responsavel: "Não informado",
+              observacoes: "",
+              recordId: "",
+              fotos: [],
+              origem: "excel"
+            });
+          });
+        });
+        return records;
+      }
+
+      function mergeReportRecords(historyData, apiData) {
+        var merged = new Map();
+        historyToRecords(historyData).forEach(function (record) {
+          merged.set(recordMergeKey(record), record);
+        });
+        (apiData && Array.isArray(apiData.registros) ? apiData.registros : []).forEach(function (record) {
+          record.origem = "planilha";
+          merged.set(recordMergeKey(record), record);
+        });
+        return Array.from(merged.values()).sort(function (a, b) {
+          return recordTime(b) - recordTime(a);
+        });
       }
 
       function populateFilter(select, values, emptyLabel) {
@@ -977,9 +1069,16 @@
       function filterRecords(records) {
         var selectedBuilding = normalizeText(inputPredio.value);
         var selectedResponsible = normalizeText(inputResponsavelFiltro.value);
+        var selectedCategory = normalizeText(inputCategoria.value);
         var search = normalizeText(inputBusca.value);
+        var start = inputInicio.value;
+        var end = inputFim.value;
 
         return records.filter(function (record) {
+          var executionIso = isoFromRecord(record);
+          if (start && (!executionIso || executionIso < start)) return false;
+          if (end && (!executionIso || executionIso > end)) return false;
+          if (selectedCategory && normalizeText(record.categoria) !== selectedCategory) return false;
           if (selectedBuilding && normalizeText(record.predioNome) !== selectedBuilding) return false;
           if (selectedResponsible && normalizeText(record.responsavel) !== selectedResponsible) return false;
           if (!search) return true;
@@ -1025,10 +1124,22 @@
         }
       }
 
+      function saveDeleteCredential(recordId, deleteToken) {
+        if (!recordId || !deleteToken) return;
+        try {
+          var saved = JSON.parse(localStorage.getItem(DELETE_KEYS_STORAGE_KEY) || "{}");
+          saved[recordId] = deleteToken;
+          localStorage.setItem(DELETE_KEYS_STORAGE_KEY, JSON.stringify(saved));
+        } catch (error) {
+          console.warn("Não foi possível salvar a chave local de exclusão.", error);
+        }
+      }
+
       function renderPhotos(record) {
         var photos = Array.isArray(record.fotos) ? record.fotos : [];
         if (!photos.length) {
-          return '<div class="empty-photos">Nenhuma foto foi localizada dentro da pasta desta execução. <a class="record-link" href="' + escapeHtml(record.folderUrl || "#") + '" target="_blank" rel="noopener">Abrir pasta no Drive</a></div>';
+          var emptyFolderLink = record.folderUrl ? ' <a class="record-link" href="' + escapeHtml(record.folderUrl) + '" target="_blank" rel="noopener">Abrir pasta no Drive</a>' : "";
+          return '<div class="empty-photos">Execução registrada sem fotos. Use <strong>Adicionar fotos</strong> quando elas estiverem disponíveis.' + emptyFolderLink + '</div>';
         }
 
         return '<div class="photo-grid">' + photos.map(function (photo, index) {
@@ -1043,6 +1154,8 @@
       }
 
       function recordTime(record) {
+        var iso = isoFromRecord(record);
+        if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) return new Date(iso + "T00:00:00").getTime();
         var timestamp = String(record.timestamp || "").match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
         if (timestamp) {
           return new Date(
@@ -1054,16 +1167,22 @@
             Number(timestamp[6] || 0)
           ).getTime();
         }
-        var iso = String(record.dataIso || "");
-        return /^\d{4}-\d{2}-\d{2}$/.test(iso) ? new Date(iso + "T00:00:00").getTime() : 0;
+        return 0;
       }
 
       function renderRecord(record, repeatInfo) {
         var folderLink = record.folderUrl ? '<a class="record-link" href="' + escapeHtml(record.folderUrl) + '" target="_blank" rel="noopener">📂 Abrir pasta com todas as fotos</a>' : "";
         var recordId = String(record.recordId || "");
         var deleteButton = getDeleteCredential(recordId) ? '<button class="delete-record-btn" type="button" data-record-id="' + escapeHtml(recordId) + '" data-record-name="' + escapeHtml(record.predioNome || "esta execução") + '">Deletar</button>' : "";
+        var actionKey = "record-" + (++recordActionCounter);
+        var photoCount = Array.isArray(record.fotos) && record.fotos.length ? record.fotos.length : (Number(record.fotosRecebidas) || 0);
+        recordActionMap.set(actionKey, record);
+        var addPhotosButton = photoCount < 20 ? '<button class="add-photos-btn" type="button" data-record-key="' + actionKey + '">Adicionar fotos</button>' : "";
         var executionPosition = repeatInfo ? repeatInfo.position : 1;
         var repeatBadge = repeatInfo && repeatInfo.total > 1 ? '<span class="record-repeat">' + repeatInfo.total + ' execuções neste prédio</span>' : "";
+        var status = record.origem === "excel"
+          ? '<span class="record-status history">● Histórico do Excel</span>'
+          : '<span class="record-status">● Registrada</span>';
         return '<article class="record-card">' +
           '<div class="record-head">' +
             '<div class="record-heading">' +
@@ -1071,7 +1190,7 @@
               '<span class="record-category">' + escapeHtml(record.categoria || "Geral") + '</span>' +
               repeatBadge +
             '</div>' +
-            '<div class="record-actions"><span class="record-status">● Registrada</span>' + deleteButton + '</div>' +
+            '<div class="record-actions">' + status + addPhotosButton + deleteButton + '</div>' +
           '</div>' +
           '<div class="record-body">' +
             '<div class="record-meta">' +
@@ -1079,12 +1198,135 @@
               '<div class="meta-item wide"><span class="meta-label">Endereço</span><span class="meta-value">' + escapeHtml(record.endereco) + '</span></div>' +
               '<div class="meta-item"><span class="meta-label">Executado em</span><span class="meta-value">' + escapeHtml(formatDate(record.dataExecucao)) + '</span></div>' +
               '<div class="meta-item"><span class="meta-label">Responsável</span><span class="meta-value">' + escapeHtml(record.responsavel || "Não informado") + '</span></div>' +
-              '<div class="meta-item"><span class="meta-label">Fotos</span><span class="meta-value">' + escapeHtml(record.fotosRecebidas || (record.fotos || []).length) + '</span></div>' +
+              '<div class="meta-item"><span class="meta-label">Fotos</span><span class="meta-value">' + escapeHtml(photoCount) + '</span></div>' +
             '</div>' +
             '<div class="record-links">' + folderLink + '</div>' +
             renderPhotos(record) +
           '</div>' +
         '</article>';
+      }
+
+      function compressPhoto(file) {
+        return new Promise(function (resolve, reject) {
+          var reader = new FileReader();
+          reader.onload = function (event) {
+            var image = new Image();
+            image.onload = function () {
+              var maxDimension = 1600;
+              var width = image.width;
+              var height = image.height;
+              if (width > height && width > maxDimension) {
+                height = Math.round(height * maxDimension / width);
+                width = maxDimension;
+              } else if (height >= width && height > maxDimension) {
+                width = Math.round(width * maxDimension / height);
+                height = maxDimension;
+              }
+
+              var canvas = document.createElement("canvas");
+              canvas.width = width;
+              canvas.height = height;
+              var context = canvas.getContext("2d");
+              context.drawImage(image, 0, 0, width, height);
+              var dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+              resolve({
+                name: String(file.name || "foto.jpg").replace(/\.[^.]+$/, "") + ".jpg",
+                mimeType: "image/jpeg",
+                base64: dataUrl.split(",")[1]
+              });
+            };
+            image.onerror = function () { reject(new Error("Não foi possível ler " + (file.name || "uma das fotos") + ".")); };
+            image.src = event.target.result;
+          };
+          reader.onerror = function () { reject(new Error("Não foi possível abrir " + (file.name || "uma das fotos") + ".")); };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function preparePhotos(files, limit) {
+        var selected = Array.prototype.slice.call(files || [], 0, limit);
+        var prepared = [];
+        var sequence = Promise.resolve();
+        selected.forEach(function (file) {
+          sequence = sequence.then(function () {
+            return compressPhoto(file).then(function (photo) { prepared.push(photo); });
+          });
+        });
+        return sequence.then(function () { return prepared; });
+      }
+
+      function beginAddPhotos(button) {
+        var record = recordActionMap.get(button.getAttribute("data-record-key") || "");
+        if (!record) return;
+        var currentCount = Array.isArray(record.fotos) && record.fotos.length ? record.fotos.length : (Number(record.fotosRecebidas) || 0);
+        if (currentCount >= 20) {
+          alert("Esta execução já atingiu o limite de 20 fotos.");
+          return;
+        }
+        pendingPhotoRecord = record;
+        pendingPhotoButton = button;
+        addPhotosInput.value = "";
+        addPhotosInput.click();
+      }
+
+      function uploadAdditionalPhotos(files) {
+        var record = pendingPhotoRecord;
+        var button = pendingPhotoButton;
+        pendingPhotoRecord = null;
+        pendingPhotoButton = null;
+        if (!record || !files || !files.length) return;
+
+        var currentCount = Array.isArray(record.fotos) && record.fotos.length ? record.fotos.length : (Number(record.fotosRecebidas) || 0);
+        var remaining = Math.max(0, 20 - currentCount);
+        if (!remaining) return;
+        if (button) {
+          button.disabled = true;
+          button.textContent = "Preparando...";
+        }
+
+        preparePhotos(files, remaining)
+          .then(function (photos) {
+            if (!photos.length) throw new Error("Nenhuma foto válida foi selecionada.");
+            if (button) button.textContent = "Enviando...";
+            return fetch(gasUrl, {
+              method: "POST",
+              headers: {"Content-Type": "text/plain;charset=utf-8"},
+              body: JSON.stringify({
+                acao: "adicionarFotos",
+                recordId: record.recordId || "",
+                categoria: record.categoria || "Geral",
+                predioNome: record.predioNome || "Prédio não informado",
+                endereco: record.endereco || "Endereço não informado",
+                dataExecucao: record.dataExecucao || formatDate(record.dataIso),
+                responsavel: record.responsavel || "Não informado",
+                observacoes: record.observacoes || "",
+                fotos: photos
+              })
+            });
+          })
+          .then(function (response) {
+            if (!response.ok) throw new Error("Resposta HTTP " + response.status);
+            return response.text();
+          })
+          .then(function (text) {
+            var data;
+            try {
+              data = JSON.parse(text);
+            } catch (error) {
+              throw new Error("O Google retornou uma resposta inválida.");
+            }
+            if (!data || data.status !== "success") throw new Error((data && data.message) || "Não foi possível anexar as fotos.");
+            saveDeleteCredential(data.recordId, data.deleteToken);
+            alert(data.message || "Fotos anexadas com sucesso.");
+            loadReport();
+          })
+          .catch(function (error) {
+            if (button) {
+              button.disabled = false;
+              button.textContent = "Adicionar fotos";
+            }
+            alert("Não foi possível anexar as fotos: " + error.message);
+          });
       }
 
       function deleteRecord(button) {
@@ -1173,7 +1415,7 @@
         } else {
           var recordsByBuilding = {};
           var executionInfo = new Map();
-          records.forEach(function (record) {
+          allRecords.forEach(function (record) {
             var key = normalizeText(record.predioNome || "Prédio não informado");
             if (!recordsByBuilding[key]) recordsByBuilding[key] = [];
             recordsByBuilding[key].push(record);
@@ -1186,6 +1428,8 @@
               executionInfo.set(record, {position: index + 1, total: buildingRecords.length});
             });
           });
+          recordActionMap = new Map();
+          recordActionCounter = 0;
           recordsContainer.innerHTML = records.map(function (record) {
             return renderRecord(record, executionInfo.get(record));
           }).join("");
@@ -1209,13 +1453,10 @@
 
         reportContent.classList.add("hidden");
         reportState.className = "loading-state";
-        reportState.textContent = "Consultando a planilha Google e localizando as fotos...";
+        reportState.textContent = "Unindo o histórico do Excel aos registros e fotos do Google Drive...";
         var params = new URLSearchParams({
-          acao: "relatorio",
-          inicio: start,
-          fim: end
+          acao: "relatorio"
         });
-        if (inputCategoria.value) params.set("categoria", inputCategoria.value);
 
         var candidatos = [gasUrl, DEFAULT_GAS_URL].filter(function (url, index, lista) {
           return url && lista.indexOf(url) === index;
@@ -1263,10 +1504,23 @@
           });
         }
 
-        consultarCandidatos(0)
-          .then(function (data) {
-            lastReportData = data;
-            renderReport(data, start, end);
+        var historyRequest = fetch("dados_historicos_2026.json?_ts=" + Date.now(), {
+          cache: "no-store",
+          credentials: "same-origin"
+        }).then(function (response) {
+          if (!response.ok) throw new Error("O histórico do Excel não pôde ser carregado.");
+          return response.json();
+        });
+
+        Promise.all([consultarCandidatos(0), historyRequest])
+          .then(function (responses) {
+            var apiData = responses[0];
+            if (!apiData || apiData.status !== "success") throw new Error((apiData && apiData.message) || "A planilha Google não respondeu corretamente.");
+            lastReportData = {
+              status: "success",
+              registros: mergeReportRecords(responses[1], apiData)
+            };
+            renderReport(lastReportData, start, end);
             document.title = "Relatório " + formatDate(start) + " a " + formatDate(end) + " • SELIM";
           })
           .catch(function (error) {
@@ -1289,6 +1543,9 @@
         document.querySelectorAll(".preset").forEach(function (item) { item.classList.remove("active"); });
       });
       btnGenerate.addEventListener("click", loadReport);
+      inputCategoria.addEventListener("change", function () {
+        if (lastReportData) renderReport(lastReportData, inputInicio.value, inputFim.value);
+      });
       inputPredio.addEventListener("change", function () {
         if (lastReportData) renderReport(lastReportData, inputInicio.value, inputFim.value);
       });
@@ -1306,9 +1563,15 @@
         loadReport();
       });
       recordsContainer.addEventListener("click", function (event) {
-        var button = event.target.closest(".delete-record-btn");
-        if (button) deleteRecord(button);
+        var deleteButton = event.target.closest(".delete-record-btn");
+        if (deleteButton) {
+          deleteRecord(deleteButton);
+          return;
+        }
+        var addButton = event.target.closest(".add-photos-btn");
+        if (addButton) beginAddPhotos(addButton);
       });
+      addPhotosInput.addEventListener("change", function () { uploadAdditionalPhotos(addPhotosInput.files); });
       document.getElementById("btnPrint").addEventListener("click", function () { window.print(); });
 
       if (query.get("inicio") && query.get("fim")) {

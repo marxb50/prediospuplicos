@@ -223,6 +223,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Configurar Ouvintes de Eventos
     setupEventListeners();
 
+    // A execução também pode ser registrada sem fotos e completada depois.
+    renderPhotosGrid();
+
     // Manter as fotos já recebidas quando a pessoa volta ao WhatsApp
     await restorePhotoDraft();
 
@@ -641,8 +644,13 @@ document.addEventListener('DOMContentLoaded', () => {
     photoCountBadge.style.background = count >= state.maxPhotos ? '#fef3c7' : '';
     photoCountBadge.style.color = count >= state.maxPhotos ? '#b45309' : '';
 
-    // Habilitar ou desabilitar botão de envio
-    btnSubmitForm.disabled = (count === 0);
+    btnSubmitForm.disabled = false;
+    const submitText = btnSubmitForm.querySelector('.btn-submit-text');
+    if (submitText) {
+      submitText.textContent = count === 0
+        ? 'Registrar Execução sem Fotos'
+        : 'Enviar Fotos e Salvar no Drive';
+    }
 
     if (count === 0) {
       photosGrid.appendChild(photosEmptyState);
@@ -696,11 +704,6 @@ document.addEventListener('DOMContentLoaded', () => {
   btnSubmitForm.addEventListener('click', async () => {
     if (state.isSubmitting) return;
 
-    if (state.attachedPhotos.length === 0) {
-      alert('Por favor, anexe pelo menos 1 foto antes de enviar.');
-      return;
-    }
-
     const dataExecFormatada = formatarDataBR(inputDataExecucao.value);
     const responsavel = inputResponsavel.value.trim();
     const observacoes = inputObservacoes.value.trim();
@@ -717,9 +720,12 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSubmitForm.disabled = true;
 
     // Exibir tela de progresso de upload
+    const possuiFotos = state.attachedPhotos.length > 0;
     showUploadProgress(
-      'Enviando Fotos...',
-      `Gravando ${state.attachedPhotos.length} fotos na pasta 'fotos selim predios publicos'`,
+      possuiFotos ? 'Enviando Fotos...' : 'Salvando Execução...',
+      possuiFotos
+        ? `Gravando ${state.attachedPhotos.length} fotos na pasta 'fotos selim predios publicos'`
+        : 'Registrando a limpeza para anexar as fotos posteriormente',
       10
     );
 
@@ -784,7 +790,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       hideUploadProgress();
       console.error('Erro no envio:', err);
-      alert('Erro ao enviar fotos para o Google Drive:\n' + err.message + '\n\nVerifique sua conexão e a URL configurada.');
+      alert('Erro ao salvar a execução:\n' + err.message + '\n\nVerifique sua conexão e a URL configurada.');
       state.isSubmitting = false;
       renderPhotosGrid();
     }
@@ -797,8 +803,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Preencher tela de sucesso
     successPredioNome.textContent = info.predioNome;
     successDataExecucao.textContent = info.dataExecucao;
-    successFotosCount.textContent = `${info.fotosCount} fotos salvas`;
-    btnOpenDriveFolder.href = info.folderUrl;
+    successFotosCount.textContent = info.fotosCount
+      ? `${info.fotosCount} fotos salvas`
+      : 'Sem fotos por enquanto';
+    const successTitle = document.querySelector('.success-title');
+    const successDesc = document.querySelector('.success-desc');
+    if (successTitle) successTitle.textContent = info.fotosCount ? 'Registro Enviado com Sucesso!' : 'Execução Registrada com Sucesso!';
+    if (successDesc) {
+      successDesc.textContent = info.fotosCount
+        ? 'As fotos foram organizadas no Google Drive e a planilha de controle foi atualizada automaticamente.'
+        : 'A limpeza foi registrada na planilha. As fotos poderão ser anexadas depois pelo relatório.';
+    }
+    btnOpenDriveFolder.href = info.folderUrl || '#';
+    btnOpenDriveFolder.classList.toggle('hidden', !info.folderUrl);
     btnOpenSheet.href = info.sheetUrl || '#';
     btnOpenSheet.classList.toggle('disabled-link', !info.sheetUrl);
     state.isSubmitting = false;
