@@ -2,11 +2,36 @@
   "name": "SELIM • Prédios Públicos Parnamirim",
   "short_name": "SELIM Fotos",
   "description": "Registro fotográfico de serviços de limpeza em prédios públicos de Parnamirim",
+  "id": "./",
   "start_url": "./index.html",
+  "scope": "./",
+  "lang": "pt-BR",
   "display": "standalone",
   "background_color": "#005da4",
   "theme_color": "#005da4",
   "orientation": "portrait",
+  "categories": [
+    "productivity",
+    "utilities"
+  ],
+  "share_target": {
+    "action": "./share-target",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "photos",
+          "accept": [
+            "image/*"
+          ]
+        }
+      ]
+    }
+  },
   "icons": [
     {
       "src": "icon-192.png",

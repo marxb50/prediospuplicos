@@ -10,6 +10,69 @@
 // real fica gravado aqui para que todos os celulares já abram conectados.
 const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbxknOR0N0KFBkfhWYJ5YtH_zj_sNmlMXjmQF6Cy7xmbwmf5Cg3IYs5zFQnP3hIAqkWB/exec";
 const DELETE_KEYS_STORAGE_KEY = 'selim_delete_keys';
+const SHARE_DB_NAME = 'selim-share-db';
+const SHARE_DB_VERSION = 1;
+const SHARE_STORE_NAME = 'shared-files';
+const SHARE_RECORD_KEY = 'pending';
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js', {
+      scope: './',
+      updateViaCache: 'none'
+    }).catch((error) => {
+      console.warn('Não foi possível ativar o recebimento de fotos compartilhadas.', error);
+    });
+  });
+}
+
+function openShareDatabase() {
+  return new Promise((resolve, reject) => {
+    if (!('indexedDB' in window)) {
+      reject(new Error('Armazenamento do navegador indisponível.'));
+      return;
+    }
+
+    const request = indexedDB.open(SHARE_DB_NAME, SHARE_DB_VERSION);
+    request.onupgradeneeded = () => {
+      const database = request.result;
+      if (!database.objectStoreNames.contains(SHARE_STORE_NAME)) {
+        database.createObjectStore(SHARE_STORE_NAME, { keyPath: 'id' });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function readPendingSharedPhotos() {
+  const database = await openShareDatabase();
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction(SHARE_STORE_NAME, 'readonly');
+    const request = transaction.objectStore(SHARE_STORE_NAME).get(SHARE_RECORD_KEY);
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => database.close();
+  });
+}
+
+async function deletePendingSharedPhotos() {
+  const database = await openShareDatabase();
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction(SHARE_STORE_NAME, 'readwrite');
+    transaction.objectStore(SHARE_STORE_NAME).delete(SHARE_RECORD_KEY);
+    transaction.oncomplete = () => {
+      database.close();
+      resolve();
+    };
+    transaction.onerror = () => {
+      database.close();
+      reject(transaction.error);
+    };
+  });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   // Estado da Aplicação
@@ -40,6 +103,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Elementos Tela 1
   const categoriesContainer = document.getElementById('categoriesContainer');
+  const sharedPhotosNotice = document.getElementById('sharedPhotosNotice');
+  const whatsappShareHelp = document.getElementById('whatsappShareHelp');
+  const btnInstallApp = document.getElementById('btnInstallApp');
+  let deferredInstallPrompt = null;
 
   // Elementos Tela 2
   const currentCategoryBadge = document.getElementById('currentCategoryBadge');
@@ -101,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
   // 1. INICIALIZAÇÃO
   // =========================================================================
-  function init() {
+  async function init() {
     // Definir data padrão de hoje no input de data (formato YYYY-MM-DD)
     const today = new Date();
     const year = today.getFullYear();
@@ -120,6 +187,76 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Configurar Ouvintes de Eventos
     setupEventListeners();
+
+    // Recuperar fotos enviadas pelo menu Compartilhar do Android/WhatsApp
+    await importSharedPhotos();
+  }
+
+  function isRunningInstalled() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+
+  function updateInstallHelp() {
+    if (!isRunningInstalled()) return;
+
+    btnInstallApp.classList.add('hidden');
+    whatsappShareHelp.innerHTML = 'Aplicativo instalado. No WhatsApp, selecione até 20 fotos, toque em Compartilhar e escolha <b>SELIM Fotos</b>.';
+  }
+
+  function showSharedPhotosNotice(count, errorMessage = '') {
+    sharedPhotosNotice.classList.remove('hidden');
+
+    if (errorMessage) {
+      sharedPhotosNotice.innerHTML = `<strong>Não foi possível receber as fotos.</strong>${errorMessage}`;
+      return;
+    }
+
+    sharedPhotosNotice.innerHTML = `<strong>${count} ${count === 1 ? 'foto recebida' : 'fotos recebidas'} do WhatsApp.</strong>Agora escolha a categoria e o prédio. As fotos já estão anexadas ao registro.`;
+  }
+
+  function cleanSharedQueryString() {
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.delete('shared');
+    currentUrl.searchParams.delete('count');
+    window.history.replaceState({}, document.title, currentUrl.toString());
+  }
+
+  async function importSharedPhotos() {
+    const query = new URLSearchParams(window.location.search);
+    if (query.get('shared') !== '1') return;
+
+    cleanSharedQueryString();
+
+    try {
+      const pending = await readPendingSharedPhotos();
+      const storedPhotos = Array.isArray(pending?.files) ? pending.files : [];
+      const sharedFiles = storedPhotos.map((storedPhoto, index) => {
+        const blob = storedPhoto.blob instanceof Blob ? storedPhoto.blob : storedPhoto;
+        return new File([blob], storedPhoto.name || `foto_whatsapp_${index + 1}.jpg`, {
+          type: storedPhoto.type || blob.type || 'image/jpeg',
+          lastModified: storedPhoto.lastModified || Date.now()
+        });
+      });
+
+      if (sharedFiles.length === 0) {
+        showSharedPhotosNotice(0, 'Nenhuma imagem foi encontrada no compartilhamento. Tente selecionar novamente as fotos no WhatsApp.');
+        return;
+      }
+
+      const previousCount = state.attachedPhotos.length;
+      await handleFilesSelected(sharedFiles);
+      const importedCount = state.attachedPhotos.length - previousCount;
+
+      if (importedCount > 0) {
+        await deletePendingSharedPhotos();
+        showSharedPhotosNotice(importedCount);
+      } else {
+        showSharedPhotosNotice(0, 'As imagens recebidas não puderam ser processadas neste celular.');
+      }
+    } catch (error) {
+      console.error('Erro ao importar fotos compartilhadas:', error);
+      showSharedPhotosNotice(0, 'Tente compartilhar as imagens novamente pelo WhatsApp.');
+    }
   }
 
   // =========================================================================
@@ -637,6 +774,30 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function setupEventListeners() {
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null;
+      updateInstallHelp();
+    });
+
+    btnInstallApp.addEventListener('click', async () => {
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        updateInstallHelp();
+        return;
+      }
+
+      alert('Abra este site no Google Chrome do Android e use o menu ⋮ > Adicionar à tela inicial ou Instalar aplicativo.');
+    });
+
+    updateInstallHelp();
+
     // Busca na Tela 2
     inputSearchPredio.addEventListener('input', filterPlaces);
     btnClearSearch.addEventListener('click', () => {
