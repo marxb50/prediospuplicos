@@ -18,7 +18,7 @@ const SHARE_DRAFT_KEY = 'photo-draft';
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js', {
+    navigator.serviceWorker.register('./service-worker.js?v=whatsapp-3', {
       scope: './',
       updateViaCache: 'none'
     }).catch((error) => {
@@ -58,6 +58,18 @@ async function readShareRecord(recordKey) {
   });
 }
 
+async function readAllShareRecords() {
+  const database = await openShareDatabase();
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction(SHARE_STORE_NAME, 'readonly');
+    const request = transaction.objectStore(SHARE_STORE_NAME).getAll();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => database.close();
+  });
+}
+
 async function writeShareRecord(record) {
   const database = await openShareDatabase();
 
@@ -75,12 +87,13 @@ async function writeShareRecord(record) {
   });
 }
 
-async function deleteShareRecord(recordKey) {
+async function deleteShareRecords(recordKeys) {
   const database = await openShareDatabase();
 
   return new Promise((resolve, reject) => {
     const transaction = database.transaction(SHARE_STORE_NAME, 'readwrite');
-    transaction.objectStore(SHARE_STORE_NAME).delete(recordKey);
+    const store = transaction.objectStore(SHARE_STORE_NAME);
+    recordKeys.forEach((recordKey) => store.delete(recordKey));
     transaction.oncomplete = () => {
       database.close();
       resolve();
@@ -90,6 +103,10 @@ async function deleteShareRecord(recordKey) {
       reject(transaction.error);
     };
   });
+}
+
+async function deleteShareRecord(recordKey) {
+  return deleteShareRecords([recordKey]);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -252,8 +269,12 @@ document.addEventListener('DOMContentLoaded', () => {
     cleanSharedQueryString();
 
     try {
-      const pending = await readShareRecord(SHARE_RECORD_KEY);
-      const storedPhotos = Array.isArray(pending?.files) ? pending.files : [];
+      const allRecords = await readAllShareRecords();
+      const incomingRecords = allRecords
+        .filter((record) => record.id === SHARE_RECORD_KEY || String(record.id).startsWith('incoming-'))
+        .sort((first, second) => (first.createdAt || 0) - (second.createdAt || 0));
+      const incomingRecordKeys = incomingRecords.map((record) => record.id);
+      const storedPhotos = incomingRecords.flatMap((record) => Array.isArray(record.files) ? record.files : []);
       const sharedFiles = storedPhotos.map((storedPhoto, index) => {
         const blob = storedPhoto.blob instanceof Blob ? storedPhoto.blob : storedPhoto;
         return new File([blob], storedPhoto.name || `foto_whatsapp_${index + 1}.jpg`, {
@@ -263,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if (sharedFiles.length === 0) {
-        await deleteShareRecord(SHARE_RECORD_KEY).catch(() => {});
+        await deleteShareRecords(incomingRecordKeys).catch(() => {});
         showSharedPhotosNotice(0, 'Nenhuma imagem foi encontrada no compartilhamento. Tente selecionar novamente as fotos no WhatsApp.');
         return;
       }
@@ -273,10 +294,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const importedCount = state.attachedPhotos.length - previousCount;
 
       if (importedCount > 0) {
-        await deleteShareRecord(SHARE_RECORD_KEY);
+        await deleteShareRecords(incomingRecordKeys);
         showSharedPhotosNotice(state.attachedPhotos.length, '', importedCount);
       } else {
-        await deleteShareRecord(SHARE_RECORD_KEY).catch(() => {});
+        await deleteShareRecords(incomingRecordKeys).catch(() => {});
         showSharedPhotosNotice(0, 'As imagens recebidas não puderam ser processadas neste celular.');
       }
     } catch (error) {

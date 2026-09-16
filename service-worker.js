@@ -1,8 +1,8 @@
 const SHARE_DB_NAME = 'selim-share-db';
 const SHARE_DB_VERSION = 1;
 const SHARE_STORE_NAME = 'shared-files';
-const SHARE_RECORD_KEY = 'pending';
 const MAX_SHARED_PHOTOS = 20;
+const APP_VERSION = 'whatsapp-3';
 
 self.addEventListener('install', () => {
   self.skipWaiting();
@@ -40,6 +40,7 @@ async function receiveSharedPhotos(request) {
   const destination = new URL('./index.html', self.registration.scope);
   destination.searchParams.set('shared', '1');
   destination.searchParams.set('count', String(photos.length));
+  destination.searchParams.set('v', APP_VERSION);
   return Response.redirect(destination.href, 303);
 }
 
@@ -69,7 +70,7 @@ async function saveSharedPhotos(photos) {
   return new Promise((resolve, reject) => {
     const transaction = database.transaction(SHARE_STORE_NAME, 'readwrite');
     transaction.objectStore(SHARE_STORE_NAME).put({
-      id: SHARE_RECORD_KEY,
+      id: `incoming-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
       createdAt: Date.now(),
       files
     });
