@@ -14,6 +14,7 @@ const SHARE_DB_NAME = 'selim-share-db';
 const SHARE_DB_VERSION = 1;
 const SHARE_STORE_NAME = 'shared-files';
 const SHARE_RECORD_KEY = 'pending';
+const SHARE_DRAFT_KEY = 'photo-draft';
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -45,24 +46,41 @@ function openShareDatabase() {
   });
 }
 
-async function readPendingSharedPhotos() {
+async function readShareRecord(recordKey) {
   const database = await openShareDatabase();
 
   return new Promise((resolve, reject) => {
     const transaction = database.transaction(SHARE_STORE_NAME, 'readonly');
-    const request = transaction.objectStore(SHARE_STORE_NAME).get(SHARE_RECORD_KEY);
+    const request = transaction.objectStore(SHARE_STORE_NAME).get(recordKey);
     request.onsuccess = () => resolve(request.result || null);
     request.onerror = () => reject(request.error);
     transaction.oncomplete = () => database.close();
   });
 }
 
-async function deletePendingSharedPhotos() {
+async function writeShareRecord(record) {
   const database = await openShareDatabase();
 
   return new Promise((resolve, reject) => {
     const transaction = database.transaction(SHARE_STORE_NAME, 'readwrite');
-    transaction.objectStore(SHARE_STORE_NAME).delete(SHARE_RECORD_KEY);
+    transaction.objectStore(SHARE_STORE_NAME).put(record);
+    transaction.oncomplete = () => {
+      database.close();
+      resolve();
+    };
+    transaction.onerror = () => {
+      database.close();
+      reject(transaction.error);
+    };
+  });
+}
+
+async function deleteShareRecord(recordKey) {
+  const database = await openShareDatabase();
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction(SHARE_STORE_NAME, 'readwrite');
+    transaction.objectStore(SHARE_STORE_NAME).delete(recordKey);
     transaction.oncomplete = () => {
       database.close();
       resolve();
@@ -188,6 +206,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Configurar Ouvintes de Eventos
     setupEventListeners();
 
+    // Manter as fotos já recebidas quando a pessoa volta ao WhatsApp
+    await restorePhotoDraft();
+
     // Recuperar fotos enviadas pelo menu Compartilhar do Android/WhatsApp
     await importSharedPhotos();
   }
@@ -200,10 +221,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isRunningInstalled()) return;
 
     btnInstallApp.classList.add('hidden');
-    whatsappShareHelp.innerHTML = 'Aplicativo instalado. No WhatsApp, selecione até 20 fotos, toque em Compartilhar e escolha <b>SELIM Fotos</b>.';
+    whatsappShareHelp.innerHTML = 'Aplicativo instalado. Abra cada foto em tela cheia no WhatsApp, toque em <b>⋮ → Compartilhar</b> e escolha <b>SELIM Fotos</b>. Repita para juntar até 20 fotos.';
   }
 
-  function showSharedPhotosNotice(count, errorMessage = '') {
+  function showSharedPhotosNotice(count, errorMessage = '', addedCount = 0) {
     sharedPhotosNotice.classList.remove('hidden');
 
     if (errorMessage) {
@@ -211,7 +232,10 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    sharedPhotosNotice.innerHTML = `<strong>${count} ${count === 1 ? 'foto recebida' : 'fotos recebidas'} do WhatsApp.</strong>Agora escolha a categoria e o prédio. As fotos já estão anexadas ao registro.`;
+    const addedText = addedCount > 0
+      ? `${addedCount} ${addedCount === 1 ? 'nova foto foi adicionada' : 'novas fotos foram adicionadas'}. `
+      : '';
+    sharedPhotosNotice.innerHTML = `<strong>${count} ${count === 1 ? 'foto pronta' : 'fotos prontas'} neste registro.</strong>${addedText}Você pode voltar ao WhatsApp para buscar mais ou escolher a categoria e o prédio.`;
   }
 
   function cleanSharedQueryString() {
@@ -228,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cleanSharedQueryString();
 
     try {
-      const pending = await readPendingSharedPhotos();
+      const pending = await readShareRecord(SHARE_RECORD_KEY);
       const storedPhotos = Array.isArray(pending?.files) ? pending.files : [];
       const sharedFiles = storedPhotos.map((storedPhoto, index) => {
         const blob = storedPhoto.blob instanceof Blob ? storedPhoto.blob : storedPhoto;
@@ -239,6 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if (sharedFiles.length === 0) {
+        await deleteShareRecord(SHARE_RECORD_KEY).catch(() => {});
         showSharedPhotosNotice(0, 'Nenhuma imagem foi encontrada no compartilhamento. Tente selecionar novamente as fotos no WhatsApp.');
         return;
       }
@@ -248,15 +273,56 @@ document.addEventListener('DOMContentLoaded', () => {
       const importedCount = state.attachedPhotos.length - previousCount;
 
       if (importedCount > 0) {
-        await deletePendingSharedPhotos();
-        showSharedPhotosNotice(importedCount);
+        await deleteShareRecord(SHARE_RECORD_KEY);
+        showSharedPhotosNotice(state.attachedPhotos.length, '', importedCount);
       } else {
+        await deleteShareRecord(SHARE_RECORD_KEY).catch(() => {});
         showSharedPhotosNotice(0, 'As imagens recebidas não puderam ser processadas neste celular.');
       }
     } catch (error) {
       console.error('Erro ao importar fotos compartilhadas:', error);
       showSharedPhotosNotice(0, 'Tente compartilhar as imagens novamente pelo WhatsApp.');
     }
+  }
+
+  async function restorePhotoDraft() {
+    try {
+      const draft = await readShareRecord(SHARE_DRAFT_KEY);
+      const savedPhotos = Array.isArray(draft?.photos) ? draft.photos.slice(0, state.maxPhotos) : [];
+      if (savedPhotos.length === 0) return;
+
+      state.attachedPhotos = savedPhotos;
+      renderPhotosGrid();
+
+      if (new URLSearchParams(window.location.search).get('shared') !== '1') {
+        showSharedPhotosNotice(savedPhotos.length);
+      }
+    } catch (error) {
+      console.warn('Não foi possível restaurar as fotos guardadas.', error);
+    }
+  }
+
+  async function savePhotoDraft() {
+    try {
+      if (state.attachedPhotos.length === 0) {
+        await deleteShareRecord(SHARE_DRAFT_KEY);
+        return;
+      }
+
+      await writeShareRecord({
+        id: SHARE_DRAFT_KEY,
+        updatedAt: Date.now(),
+        photos: state.attachedPhotos.slice(0, state.maxPhotos)
+      });
+    } catch (error) {
+      console.warn('Não foi possível guardar temporariamente as fotos.', error);
+    }
+  }
+
+  async function clearPhotoDraft() {
+    await deleteShareRecord(SHARE_DRAFT_KEY).catch((error) => {
+      console.warn('Não foi possível limpar as fotos temporárias.', error);
+    });
   }
 
   // =========================================================================
@@ -491,6 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     hideUploadProgress();
     renderPhotosGrid();
+    await savePhotoDraft();
   }
 
   /**
@@ -586,9 +653,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function removePhoto(id) {
+  async function removePhoto(id) {
     state.attachedPhotos = state.attachedPhotos.filter(p => p.id !== id);
     renderPhotosGrid();
+    await savePhotoDraft();
   }
 
   function openPhotoViewer(url) {
@@ -701,8 +769,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  function finishSuccess(info) {
+  async function finishSuccess(info) {
     hideUploadProgress();
+    await clearPhotoDraft();
 
     // Preencher tela de sucesso
     successPredioNome.textContent = info.predioNome;
@@ -720,13 +789,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
   // 7. TELA 4: NOVO REGISTRO (RESET)
   // =========================================================================
-  btnNewSubmission.addEventListener('click', () => {
+  btnNewSubmission.addEventListener('click', async () => {
     // Resetar campos de foto e observações
     state.attachedPhotos = [];
     state.selectedPlace = null;
     inputObservacoes.value = '';
     inputResponsavel.value = '';
     renderPhotosGrid();
+    await clearPhotoDraft();
 
     // Voltar para a Tela 1
     goToStep(1);
