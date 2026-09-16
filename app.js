@@ -18,7 +18,7 @@ const SHARE_DRAFT_KEY = 'photo-draft';
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js?v=excel-history-1', {
+    navigator.serviceWorker.register('./service-worker.js?v=whatsapp-old-1', {
       scope: './',
       updateViaCache: 'none'
     }).catch((error) => {
@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isRunningInstalled()) return;
 
     btnInstallApp.classList.add('hidden');
-    whatsappShareHelp.innerHTML = 'Aplicativo instalado. Abra cada foto em tela cheia no WhatsApp, toque em <b>⋮ → Compartilhar</b> e escolha <b>SELIM Fotos</b>. Repita para juntar até 20 fotos.';
+    whatsappShareHelp.innerHTML = 'Aplicativo instalado. Abra cada foto em tela cheia no WhatsApp, toque em <b>⋮ → Compartilhar</b> e escolha <b>SELIM Fotos</b>. Depois você pode registrar uma nova execução ou abrir <b>Relatório → Adicionar fotos</b> em uma execução antiga.';
   }
 
   function showSharedPhotosNotice(count, errorMessage = '', addedCount = 0) {
@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const addedText = addedCount > 0
       ? `${addedCount} ${addedCount === 1 ? 'nova foto foi adicionada' : 'novas fotos foram adicionadas'}. `
       : '';
-    sharedPhotosNotice.innerHTML = `<strong>${count} ${count === 1 ? 'foto pronta' : 'fotos prontas'} neste registro.</strong>${addedText}Você pode voltar ao WhatsApp para buscar mais ou escolher a categoria e o prédio.`;
+    sharedPhotosNotice.innerHTML = `<strong>${count} ${count === 1 ? 'foto pronta' : 'fotos prontas'}.</strong>${addedText}Você pode registrar uma nova execução ou abrir <b>Relatório → Adicionar fotos</b> para anexar a uma execução antiga.`;
   }
 
   function cleanSharedQueryString() {
@@ -925,6 +925,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnOpenReports.addEventListener('click', (event) => {
       event.preventDefault();
       const reportUrl = new URL('relatorio.html', window.location.href);
+      reportUrl.searchParams.set('cache', 'whatsapp-old-1');
       if (state.scriptUrl) reportUrl.searchParams.set('gas', state.scriptUrl);
       window.open(reportUrl.toString(), '_blank', 'noopener,noreferrer');
     });

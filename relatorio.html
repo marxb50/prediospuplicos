@@ -913,6 +913,10 @@
     (function () {
       var DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbxknOR0N0KFBkfhWYJ5YtH_zj_sNmlMXjmQF6Cy7xmbwmf5Cg3IYs5zFQnP3hIAqkWB/exec";
       var DELETE_KEYS_STORAGE_KEY = "selim_delete_keys";
+      var SHARE_DB_NAME = "selim-share-db";
+      var SHARE_DB_VERSION = 1;
+      var SHARE_STORE_NAME = "shared-files";
+      var SHARE_DRAFT_KEY = "photo-draft";
       var query = new URLSearchParams(window.location.search);
       var gasUrl = query.get("gas") || localStorage.getItem("selim_gas_url") || DEFAULT_GAS_URL;
       var inputInicio = document.getElementById("inputInicio");
@@ -932,6 +936,7 @@
       var recordActionCounter = 0;
       var pendingPhotoRecord = null;
       var pendingPhotoButton = null;
+      var cachedWhatsAppDraft = null;
       var addPhotosInput = document.createElement("input");
       addPhotosInput.type = "file";
       addPhotosInput.accept = "image/*";
@@ -1135,6 +1140,97 @@
         }
       }
 
+      function openSharedPhotosDatabase() {
+        return new Promise(function (resolve, reject) {
+          if (!("indexedDB" in window)) {
+            reject(new Error("Armazenamento do navegador indisponível."));
+            return;
+          }
+          var request = indexedDB.open(SHARE_DB_NAME, SHARE_DB_VERSION);
+          request.onupgradeneeded = function () {
+            var database = request.result;
+            if (!database.objectStoreNames.contains(SHARE_STORE_NAME)) {
+              database.createObjectStore(SHARE_STORE_NAME, {keyPath: "id"});
+            }
+          };
+          request.onsuccess = function () { resolve(request.result); };
+          request.onerror = function () { reject(request.error); };
+        });
+      }
+
+      function readWhatsAppPhotoDraft() {
+        return openSharedPhotosDatabase().then(function (database) {
+          return new Promise(function (resolve, reject) {
+            var transaction = database.transaction(SHARE_STORE_NAME, "readonly");
+            var request = transaction.objectStore(SHARE_STORE_NAME).get(SHARE_DRAFT_KEY);
+            request.onsuccess = function () { resolve(request.result || null); };
+            request.onerror = function () { reject(request.error); };
+            transaction.oncomplete = function () { database.close(); };
+          });
+        });
+      }
+
+      function refreshWhatsAppDraftCache() {
+        return readWhatsAppPhotoDraft()
+          .then(function (draft) {
+            cachedWhatsAppDraft = draft;
+            return draft;
+          })
+          .catch(function (error) {
+            cachedWhatsAppDraft = null;
+            console.warn("Não foi possível consultar as fotos recebidas do WhatsApp.", error);
+            return null;
+          });
+      }
+
+      function removeWhatsAppDraftPhotos(photoIds) {
+        var ids = new Set(photoIds || []);
+        if (!ids.size) return Promise.resolve();
+        return openSharedPhotosDatabase().then(function (database) {
+          return new Promise(function (resolve, reject) {
+            var transaction = database.transaction(SHARE_STORE_NAME, "readwrite");
+            var store = transaction.objectStore(SHARE_STORE_NAME);
+            var request = store.get(SHARE_DRAFT_KEY);
+            request.onsuccess = function () {
+              var draft = request.result;
+              if (!draft || !Array.isArray(draft.photos)) return;
+              var remaining = draft.photos.filter(function (photo) { return !ids.has(photo.id); });
+              if (remaining.length) {
+                draft.photos = remaining;
+                draft.updatedAt = Date.now();
+                store.put(draft);
+              } else {
+                store.delete(SHARE_DRAFT_KEY);
+              }
+            };
+            request.onerror = function () { reject(request.error); };
+            transaction.oncomplete = function () {
+              database.close();
+              resolve();
+            };
+            transaction.onerror = function () {
+              database.close();
+              reject(transaction.error);
+            };
+          });
+        });
+      }
+
+      function prepareWhatsAppDraftPhotos(draft, limit) {
+        return (draft && Array.isArray(draft.photos) ? draft.photos : [])
+          .slice(0, limit)
+          .map(function (photo, index) {
+            var base64 = photo.base64 || (String(photo.dataUrl || "").split(",")[1] || "");
+            return {
+              draftId: photo.id || "",
+              name: photo.name || ("foto_whatsapp_" + pad(index + 1) + ".jpg"),
+              mimeType: photo.mimeType || "image/jpeg",
+              base64: base64
+            };
+          })
+          .filter(function (photo) { return photo.base64; });
+      }
+
       function renderPhotos(record) {
         var photos = Array.isArray(record.fotos) ? record.fotos : [];
         if (!photos.length) {
@@ -1263,6 +1359,28 @@
           alert("Esta execução já atingiu o limite de 20 fotos.");
           return;
         }
+        var remaining = 20 - currentCount;
+        var draft = cachedWhatsAppDraft;
+        var sharedPhotos = prepareWhatsAppDraftPhotos(draft, remaining);
+
+        if (sharedPhotos.length) {
+          var totalDraft = Array.isArray(draft.photos) ? draft.photos.length : sharedPhotos.length;
+          var limitText = totalDraft > remaining
+            ? " Serão usadas as primeiras " + remaining + "; as demais continuarão guardadas."
+            : "";
+          var useWhatsApp = window.confirm(
+            "Há " + totalDraft + (totalDraft === 1 ? " foto recebida" : " fotos recebidas") +
+            " do WhatsApp. Deseja anexá-la" + (totalDraft === 1 ? "" : "s") +
+            " a esta execução?" + limitText +
+            "\n\nOK: usar fotos do WhatsApp.\nCancelar: escolher na galeria."
+          );
+          if (useWhatsApp) {
+            uploadPreparedPhotos(record, button, sharedPhotos, sharedPhotos.map(function (photo) { return photo.draftId; }).filter(Boolean))
+              .catch(function (error) { alert("Não foi possível anexar as fotos: " + error.message); });
+            return;
+          }
+        }
+
         pendingPhotoRecord = record;
         pendingPhotoButton = button;
         addPhotosInput.value = "";
@@ -1287,23 +1405,45 @@
         preparePhotos(files, remaining)
           .then(function (photos) {
             if (!photos.length) throw new Error("Nenhuma foto válida foi selecionada.");
-            if (button) button.textContent = "Enviando...";
-            return fetch(gasUrl, {
-              method: "POST",
-              headers: {"Content-Type": "text/plain;charset=utf-8"},
-              body: JSON.stringify({
-                acao: "adicionarFotos",
-                recordId: record.recordId || "",
-                categoria: record.categoria || "Geral",
-                predioNome: record.predioNome || "Prédio não informado",
-                endereco: record.endereco || "Endereço não informado",
-                dataExecucao: record.dataExecucao || formatDate(record.dataIso),
-                responsavel: record.responsavel || "Não informado",
-                observacoes: record.observacoes || "",
-                fotos: photos
-              })
-            });
+            return uploadPreparedPhotos(record, button, photos, []);
           })
+          .catch(function (error) {
+            if (button) {
+              button.disabled = false;
+              button.textContent = "Adicionar fotos";
+            }
+            alert("Não foi possível anexar as fotos: " + error.message);
+          });
+      }
+
+      function uploadPreparedPhotos(record, button, photos, draftPhotoIds) {
+        if (button) {
+          button.disabled = true;
+          button.textContent = "Enviando...";
+        }
+        var payloadPhotos = photos.map(function (photo) {
+          return {
+            name: photo.name,
+            mimeType: photo.mimeType,
+            base64: photo.base64
+          };
+        });
+
+        return fetch(gasUrl, {
+          method: "POST",
+          headers: {"Content-Type": "text/plain;charset=utf-8"},
+          body: JSON.stringify({
+            acao: "adicionarFotos",
+            recordId: record.recordId || "",
+            categoria: record.categoria || "Geral",
+            predioNome: record.predioNome || "Prédio não informado",
+            endereco: record.endereco || "Endereço não informado",
+            dataExecucao: record.dataExecucao || formatDate(record.dataIso),
+            responsavel: record.responsavel || "Não informado",
+            observacoes: record.observacoes || "",
+            fotos: payloadPhotos
+          })
+        })
           .then(function (response) {
             if (!response.ok) throw new Error("Resposta HTTP " + response.status);
             return response.text();
@@ -1317,15 +1457,21 @@
             }
             if (!data || data.status !== "success") throw new Error((data && data.message) || "Não foi possível anexar as fotos.");
             saveDeleteCredential(data.recordId, data.deleteToken);
-            alert(data.message || "Fotos anexadas com sucesso.");
-            loadReport();
+            return removeWhatsAppDraftPhotos(draftPhotoIds)
+              .catch(function (error) { console.warn("As fotos foram salvas, mas o rascunho local não pôde ser limpo.", error); })
+              .then(function () { return refreshWhatsAppDraftCache(); })
+              .then(function () {
+                alert(data.message || "Fotos anexadas com sucesso.");
+                loadReport();
+                return data;
+              });
           })
           .catch(function (error) {
             if (button) {
               button.disabled = false;
               button.textContent = "Adicionar fotos";
             }
-            alert("Não foi possível anexar as fotos: " + error.message);
+            throw error;
           });
       }
 
@@ -1572,6 +1718,9 @@
         if (addButton) beginAddPhotos(addButton);
       });
       addPhotosInput.addEventListener("change", function () { uploadAdditionalPhotos(addPhotosInput.files); });
+      document.addEventListener("visibilitychange", function () {
+        if (!document.hidden) refreshWhatsAppDraftCache();
+      });
       document.getElementById("btnPrint").addEventListener("click", function () { window.print(); });
 
       if (query.get("inicio") && query.get("fim")) {
@@ -1581,7 +1730,7 @@
       } else {
         setPeriod("month");
       }
-      loadReport();
+      refreshWhatsAppDraftCache().then(loadReport);
     }());
   </script>
 </body>

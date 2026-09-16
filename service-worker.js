@@ -2,7 +2,7 @@ const SHARE_DB_NAME = 'selim-share-db';
 const SHARE_DB_VERSION = 1;
 const SHARE_STORE_NAME = 'shared-files';
 const MAX_SHARED_PHOTOS = 20;
-const APP_VERSION = 'whatsapp-3';
+const APP_VERSION = 'whatsapp-old-1';
 
 self.addEventListener('install', () => {
   self.skipWaiting();
