@@ -18,7 +18,7 @@ const SHARE_DRAFT_KEY = 'photo-draft';
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js?v=whatsapp-3', {
+    navigator.serviceWorker.register('./service-worker.js?v=excel-history-1', {
       scope: './',
       updateViaCache: 'none'
     }).catch((error) => {
